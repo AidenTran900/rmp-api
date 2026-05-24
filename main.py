@@ -355,7 +355,7 @@ def get_all_ratings(
 
 
 def get_representative_ratings(professor_id: str, n: int = 12) -> list[Rating]:
-    """Return n ratings evenly spread across time (newest → oldest)."""
+    """Return n ratings evenly spread across time (newest -> oldest)."""
     all_ratings = get_all_ratings(professor_id)
     if len(all_ratings) <= n:
         return all_ratings
