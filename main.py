@@ -354,6 +354,15 @@ def get_all_ratings(
     return all_ratings
 
 
+def get_representative_ratings(professor_id: str, n: int = 12) -> list[Rating]:
+    """Return n ratings evenly spread across time (newest → oldest)."""
+    all_ratings = get_all_ratings(professor_id)
+    if len(all_ratings) <= n:
+        return all_ratings
+    step = len(all_ratings) // n
+    return all_ratings[::step][:n]
+
+
 # --- Example usage ---
 if __name__ == "__main__":
     schools = search_schools("University of California Berkeley")
