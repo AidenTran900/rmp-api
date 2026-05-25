@@ -1,6 +1,13 @@
-site_name: RateMyProfessors API
+site_name: rmp-api
+site_description: Python wrapper for the RateMyProfessors GraphQL API
+
 theme:
   name: material
+  features:
+    - navigation.instant
+    - navigation.top
+    - search.suggest
+    - search.highlight
 
 plugins:
   - search
@@ -11,7 +18,11 @@ plugins:
 
 nav:
   - Home: index.md
+  - Getting Started: getting-started.md
   - API Reference:
     - Client: api/client.md
     - Models: api/models.md
     - Scoring: api/scoring.md
+  - Examples: examples.md
+  - Troubleshooting: troubleshooting.md
+  - FAQ: faq.md

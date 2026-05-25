@@ -1,64 +1,57 @@
 # rmp-api
 
-Python wrapper for the RateMyProfessors GraphQL API. Fetch professor ratings, compute quality signals, and compare professors programmatically.
+A Python library for querying the RateMyProfessors GraphQL API. Search for professors, pull their ratings, and compute quality signals from the data.
 
-> Based on [snow4060/rmp-api](https://github.com/snow4060/rmp-api).
 
-## Installation
+---
+
+## Install
 
 ```bash
 pip install git+https://github.com/youruser/rate-my-prof-api.git
 ```
 
-Or install locally:
+Requires Python 3.10+.
 
-```bash
-git clone https://github.com/youruser/rate-my-prof-api.git
-cd rate-my-prof-api
-pip install -e .
-```
+---
 
-## Quick start
+## Example
 
 ```python
-from rmp_api import (
-    search_schools,
-    search_professors,
-    get_professor_summary,
-    get_all_ratings,
-    compute_score,
-    WEIGHT_PRESETS,
-)
+from rmp_api import search_schools, search_professors, get_all_ratings, compute_score
 
-# Find a school
 schools = search_schools("UC Berkeley")
 school_id = schools[0]["node"]["id"]
 
-# Get aggregate stats for a professor
-summary = get_professor_summary("John DeNero", school_id)
-print(summary.avg_rating, summary.link)
+professors = search_professors("John DeNero", school_id)
+professor_id = professors[0]["node"]["id"]
 
-# Fetch all individual ratings
-professor_id = search_professors("John DeNero", school_id)[0]["node"]["id"]
 ratings = get_all_ratings(professor_id)
+score = compute_score(ratings)
 
-# Compute quality signals
-score = compute_score(ratings, weights=WEIGHT_PRESETS["best_teacher"])
-print(score.composite_score, score.top_tags)
+print(score.composite_score)     # 0.82
+print(score.top_tags[:3])        # [('Respected', 14), ('Clear grading', 11), ...]
 ```
 
-## Key concepts
+---
 
-**IDs.** Two ID formats appear throughout the API. The `school_id` and `professor_id` parameters expect base64-encoded node IDs (e.g. `"U2Nob29sLTEyMw=="`). Retrieve these from the `node.id` field on search results. The `legacy_id` field (plain integer) is used only for constructing profile URLs.
+## What it does
 
-**Pagination.** `get_ratings_page` returns one page at a time with a cursor. `get_all_ratings` wraps it and paginates automatically. Prefer `get_all_ratings` unless you need incremental loading.
+- Search for schools and professors by name
+- Fetch individual student ratings with comments, grades, tags, and difficulty scores
+- Compute quality signals: recency-weighted rating, reliability score, easiness, would-take-again rate
+- Compare multiple professors side-by-side on any signal
+- Track how a professor's score has changed over time (by year, semester, or quarter)
+- Filter ratings by course code, keyword, or delivery format
 
-**Caching.** `search_schools`, `search_professors`, `get_courses`, and the internal paginator are `lru_cache`-decorated. Results are cached for the process lifetime. Call `_fetch_all_ratings_cached.cache_clear()` to invalidate rating caches manually.
+---
 
-**Rating order.** Ratings are returned newest first by the RMP API.
+## Where to go next
 
-## Notes
+Just getting started? Read the [Getting Started](getting-started.md) guide. It walks through installation, your first request, and the most common mistakes.
 
-- No authentication required. Uses the public GraphQL endpoint.
-- RMP may rate-limit heavy pagination. Add `time.sleep(0.5)` between requests if needed.
-- `would_take_again_percent` and `would_take_again_pct` are `-1` or `0.0` respectively when insufficient data is available.
+Looking for a specific function? Check the [API Reference](api/client.md).
+
+Want to see more complete code? The [Examples](examples.md) page covers comparing professors, filtering by course, tracking trends, and more.
+
+Something not working? See [Troubleshooting](troubleshooting.md).
