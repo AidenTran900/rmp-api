@@ -14,6 +14,7 @@ Exports:
     filter_ratings_by_keywords(ratings, keywords, ...) -> list[Rating]
 """
 
+from functools import lru_cache
 from pathlib import Path
 
 import requests
@@ -122,6 +123,7 @@ API functions
 ---------------------------------------------------------------------------
 """
 
+@lru_cache(maxsize=128)
 def search_schools(school_name: str) -> list[dict] | None:
     """
     Search for schools by name.
@@ -142,6 +144,7 @@ def search_schools(school_name: str) -> list[dict] | None:
         return None
 
 
+@lru_cache(maxsize=128)
 def search_professors(
     professor_name: str,
     school_id: str,
@@ -266,33 +269,17 @@ def get_ratings_page(
         return [], False, None
 
 
-def get_all_ratings(
+@lru_cache(maxsize=256)
+def _fetch_all_ratings_cached(
     professor_id: str,
-    course_filter: str | list[str] | None = None,
-    page_size: int = 20,
+    course_filter: str | None,
+    page_size: int,
 ) -> list[Rating]:
     """
-    Fetch all ratings for a professor, auto-paginating until exhausted.
+    Cached inner fetch for a single course (or all courses when ``None``).
 
-    Args:
-        professor_id: Base64-encoded RMP professor node ID.
-        course_filter: Optional course code(s) to filter ratings. Accepts a
-            single string (e.g. ``"CS61A"``), a list of strings
-            (e.g. ``["CS61A", "CS61B"]``), or ``None`` for all ratings.
-            When a list is given, one paginated request sequence is made per
-            course and results are concatenated in the same order.
-        page_size: Ratings fetched per page (default ``20``).
-
-    Returns:
-        Combined list of :class:`~models.Rating` objects across all pages.
-        Empty list if the first page fails.
+    Not part of the public API — call :func:`get_all_ratings` instead.
     """
-    if isinstance(course_filter, list):
-        all_ratings = []
-        for course in course_filter:
-            all_ratings.extend(get_all_ratings(professor_id, course_filter=course, page_size=page_size))
-        return all_ratings
-
     all_ratings = []
     cursor = None
 
@@ -311,6 +298,41 @@ def get_all_ratings(
     return all_ratings
 
 
+def get_all_ratings(
+    professor_id: str,
+    course_filter: str | list[str] | None = None,
+    page_size: int = 20,
+) -> list[Rating]:
+    """
+    Fetch all ratings for a professor, auto-paginating until exhausted.
+
+    Results are cached per ``(professor_id, course_filter, page_size)`` for
+    the lifetime of the process. Call :func:`get_all_ratings.cache_clear` (via
+    ``_fetch_all_ratings_cached.cache_clear()``) to invalidate manually.
+
+    Args:
+        professor_id: Base64-encoded RMP professor node ID.
+        course_filter: Optional course code(s) to filter ratings. Accepts a
+            single string (e.g. ``"CS61A"``), a list of strings
+            (e.g. ``["CS61A", "CS61B"]``), or ``None`` for all ratings.
+            When a list is given, one paginated request sequence is made per
+            course and results are concatenated in the same order.
+        page_size: Ratings fetched per page (default ``20``).
+
+    Returns:
+        Combined list of :class:`~models.Rating` objects across all pages.
+        Empty list if the first page fails.
+    """
+    if isinstance(course_filter, list):
+        all_ratings = []
+        for course in course_filter:
+            all_ratings.extend(_fetch_all_ratings_cached(professor_id, course, page_size))
+        return all_ratings
+
+    return list(_fetch_all_ratings_cached(professor_id, course_filter, page_size))
+
+
+@lru_cache(maxsize=128)
 def get_courses(professor_id: str) -> list[dict] | None:
     """
     Fetch all courses a professor has taught, as listed in the RMP review filter.
