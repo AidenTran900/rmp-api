@@ -385,7 +385,7 @@ def get_representative_ratings(
     """
     Return ``n`` ratings evenly sampled across all available ratings.
 
-    Ratings are ordered newest → oldest by the API. Sampling is uniform by
+    Ratings are ordered newest -> oldest by the API. Sampling is uniform by
     index (stride = total // n), so the result spans the full temporal range.
     If the professor has ``<= n`` ratings, all are returned as-is.
 

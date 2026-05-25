@@ -143,6 +143,31 @@ class ProfessorScore:
 
 
 @dataclass
+class ScoreTimeline:
+    """
+    Professor scores bucketed over time with a linear trend.
+
+    Produced by :func:`~scoring.compute_score_over_time`. Buckets are sorted
+    oldest -> newest; each contains a full :class:`ProfessorScore` computed
+    from only the ratings in that period.
+
+    Attributes:
+        periods: List of ``(label, score)`` pairs, oldest first.
+            Label format depends on the ``period`` argument:
+            ``"year"`` -> ``"2023"``;
+            ``"semester"`` -> ``"2023-Spring"`` / ``"2023-Fall"``;
+            ``"quarter"`` -> ``"2023-Q1"`` … ``"2023-Q4"``.
+        trend: Linear-regression slope of ``composite_score`` across bucket
+            indices. Positive = improving over time; negative = declining.
+        total_span_years: Time span covered by all dated ratings in years.
+    """
+
+    periods: list[tuple[str, "ProfessorScore"]]
+    trend: float
+    total_span_years: float
+
+
+@dataclass
 class SplitScore:
     """
     Professor scores split by delivery format.

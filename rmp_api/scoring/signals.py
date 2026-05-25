@@ -59,7 +59,7 @@ def compute_easiness_score(ratings: list[Rating]) -> float:
     """
     Inverse of average difficulty, normalised to ``[0, 1]``.
 
-    ``difficulty = 1`` (easiest) → ``1.0``; ``difficulty = 5`` → ``0.0``.
+    ``difficulty = 1`` (easiest) -> ``1.0``; ``difficulty = 5`` -> ``0.0``.
     Ratings with ``None`` difficulty are excluded from both sides.
 
     Args:
