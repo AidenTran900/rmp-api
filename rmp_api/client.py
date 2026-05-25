@@ -11,6 +11,7 @@ Exports:
     get_all_ratings(professor_id, ...) -> list[Rating]
     get_representative_ratings(professor_id, n) -> list[Rating]
     get_courses(professor_id) -> list[dict] | None
+    filter_ratings_by_keywords(ratings, keywords, ...) -> list[Rating]
 """
 
 from pathlib import Path
@@ -329,6 +330,51 @@ def get_courses(professor_id: str) -> list[dict] | None:
     except Exception as e:
         print(f"Error fetching courses: {e}")
         return None
+
+
+def filter_ratings_by_keywords(
+    ratings: list[Rating],
+    keywords: str | list[str],
+    match_all: bool = False,
+    case_sensitive: bool = False,
+) -> list[Rating]:
+    """
+    Filter ratings whose comment contains one or more keywords.
+
+    Args:
+        ratings: List of :class:`~models.Rating` objects to filter.
+        keywords: Keyword string or list of keyword strings to search for.
+            Each keyword is matched as a substring of the comment.
+        match_all: When ``True``, a rating must contain **all** keywords
+            (AND logic). When ``False`` (default), any single keyword match
+            is sufficient (OR logic).
+        case_sensitive: When ``True``, matching is case-sensitive.
+            Default ``False`` (case-insensitive).
+
+    Returns:
+        List of :class:`~models.Rating` objects whose ``comment`` field
+        satisfies the keyword filter. Preserves original order.
+        Ratings with an empty or ``None`` comment are always excluded.
+    """
+    if isinstance(keywords, str):
+        keywords = [keywords]
+
+    if not keywords:
+        return list(ratings)
+
+    if not case_sensitive:
+        keywords = [kw.lower() for kw in keywords]
+
+    def _matches(rating: Rating) -> bool:
+        comment = rating.comment
+        if not comment:
+            return False
+        text = comment if case_sensitive else comment.lower()
+        if match_all:
+            return all(kw in text for kw in keywords)
+        return any(kw in text for kw in keywords)
+
+    return [r for r in ratings if _matches(r)]
 
 
 def get_representative_ratings(

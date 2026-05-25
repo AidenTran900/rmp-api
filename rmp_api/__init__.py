@@ -5,6 +5,7 @@ Python wrapper for the RateMyProfessors GraphQL API.
 """
 
 from .client import (
+    filter_ratings_by_keywords,
     get_all_ratings,
     get_courses,
     get_professor_summary,
@@ -25,6 +26,7 @@ __all__ = [
     "get_all_ratings",
     "get_representative_ratings",
     "get_courses",
+    "filter_ratings_by_keywords",
     # Models
     "Rating",
     "ProfessorRating",
