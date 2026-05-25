@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rmp-api"
+version = "0.1.0"
+description = "Python wrapper for the RateMyProfessors GraphQL API"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = ["requests"]
+
+[tool.hatchling.build.targets.wheel]
+packages = ["rmp_api"]
+
+[tool.hatchling.build.targets.wheel.sources]
+"rmp_api" = "rmp_api"
+
+[tool.hatchling.build.force-include]
+"rmp_api/queries" = "rmp_api/queries"

@@ -1,5 +1,7 @@
 """
-client.py — RateMyProfessors GraphQL API client.
+client.py
+
+RateMyProfessors GraphQL API client.
 
 Exports:
     search_schools(school_name) -> list[dict] | None
@@ -14,11 +16,14 @@ from pathlib import Path
 
 import requests
 
-from models import ProfessorRating, Rating
+from .models import ProfessorRating, Rating
 
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
+
+"""
+---------------------------------------------------------------------------
+Constants
+---------------------------------------------------------------------------
+"""
 
 API_LINK = "https://www.ratemyprofessors.com/graphql"
 
@@ -27,7 +32,7 @@ HEADERS = {
     "Accept": "*/*",
     "Accept-Language": "en-US,en;q=0.5",
     "Content-Type": "application/json",
-    "Authorization": "Basic dGVzdDp0ZXN0",
+    "Authorization": "Basic dGVzdDp0ZXN0", # Base64, "test:test"
     "Sec-GPC": "1",
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
@@ -42,9 +47,12 @@ SCHOOL_QUERY = (_QUERIES_DIR / "school_search.graphql").read_text()
 RATINGS_LIST_QUERY = (_QUERIES_DIR / "rating_list.graphql").read_text()
 
 
-# ---------------------------------------------------------------------------
-# Private helpers
-# ---------------------------------------------------------------------------
+
+"""
+---------------------------------------------------------------------------
+Private helpers
+---------------------------------------------------------------------------
+"""
 
 def _graphql(query: str, variables: dict) -> dict:
     """
@@ -104,9 +112,12 @@ def _parse_rating(edge: dict) -> Rating:
     )
 
 
-# ---------------------------------------------------------------------------
-# API functions
-# ---------------------------------------------------------------------------
+
+"""
+---------------------------------------------------------------------------
+API functions
+---------------------------------------------------------------------------
+"""
 
 def search_schools(school_name: str) -> list[dict] | None:
     """

@@ -1,11 +1,10 @@
 """
 main.py
 
-api usage example for the RMP API wrapper.
+API usage example for the rmp-api package.
 """
 
-
-from client import search_schools, search_professors, get_ratings_page, get_all_ratings
+from rmp_api import get_all_ratings, get_ratings_page, search_professors, search_schools
 
 if __name__ == "__main__":
     schools = search_schools("University of California Berkeley")

@@ -35,7 +35,6 @@ class ProfessorRating:
     department: str
     link: str
 
-
 @dataclass
 class Rating:
     """
@@ -82,3 +81,62 @@ class Rating:
     thumbs_up_total: int
     thumbs_down_total: int
     teacher_note: str | None
+
+@dataclass
+class ProfessorScore:
+    """
+    All quality signals computed from a professor's :class:`Rating` list.
+
+    Produced by :func:`~scoring.compute_score`. All scores are normalized
+    unless noted otherwise.
+
+    Attributes:
+        num_ratings: Total number of ratings used to compute this score.
+
+        raw_avg_rating: Simple mean of ``(helpful + clarity) / 2`` across all ratings (1–5).
+        avg_clarity: Mean clarity rating (1–5).
+        avg_helpfulness: Mean helpfulness rating (1–5).
+        avg_difficulty: Mean difficulty rating (1–5). ``0.0`` if no difficulty data.
+
+        recency_weighted_rating: Exponential-decay-weighted mean of overall quality (1–5).
+            Older ratings contribute less; half-life configurable in ``compute_score``.
+        reliability_score: Bayesian confidence based on sample size (0–1).
+            ~0.5 at 25 ratings, approaches 1 asymptotically.
+        easiness_score: Inverse of average difficulty, normalised to 0–1.
+            ``1.0`` = easiest (avg difficulty 1), ``0.0`` = hardest (avg difficulty 5).
+        would_take_again_pct: Fraction of students who would take the professor again (0–1).
+
+        last_review_date: Date of the most recent rating as ``"YYYY-MM-DD"``, or ``None``.
+        review_velocity: Reviews posted per year within a 2-year rolling window.
+
+        top_tags: Up to 10 most common student-selected tags as ``(tag, count)`` pairs.
+        difficulty_histogram: Count of ratings per difficulty bucket ``{1: n, 2: n, …, 5: n}``.
+
+        composite_score: Weighted combination of signals, clamped to ``[0, 1]``.
+            Weights determined by the preset or custom dict passed to ``compute_score``.
+    """
+
+    num_ratings: int
+
+    # Raw aggregates
+    raw_avg_rating: float
+    avg_clarity: float
+    avg_helpfulness: float
+    avg_difficulty: float
+
+    # Derived signals
+    recency_weighted_rating: float
+    reliability_score: float
+    easiness_score: float
+    would_take_again_pct: float
+
+    # Activity
+    last_review_date: str | None
+    review_velocity: float
+
+    # Tags & histogram
+    top_tags: list[tuple[str, int]] = field(default_factory=list)
+    difficulty_histogram: dict[int, int] = field(default_factory=dict)
+
+    # Composite
+    composite_score: float = 0.0
