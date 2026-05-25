@@ -1,6 +1,6 @@
 # Rate My Professor API
 
-A Python library for querying the RateMyProfessors GraphQL API. Search for professors, pull their ratings, and compute quality signals from the data.
+An UNOFFICIAL Python library for querying the RateMyProfessors GraphQL API. Search for professors, pull their ratings, and compute quality signals from the data.
 
 
 ---

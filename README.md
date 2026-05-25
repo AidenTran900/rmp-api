@@ -1,8 +1,6 @@
 # [rmp-api](https://github.com/AidenTran900/rmp-api)
 
-A Python library for querying the RateMyProfessors GraphQL API. Search for professors, fetch their ratings, and compute quality signals from the data.
-
-No API key required. No scraping. Requires Python 3.10+.
+An UNOFFICIAL Python library for querying the RateMyProfessors GraphQL API. Search for professors, fetch their ratings, and compute quality signals from the data.
 
 ---
 
