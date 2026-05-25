@@ -1,4 +1,4 @@
-# rmp-api
+# [rmp-api](https://pypi.org/project/rmp-api/)
 
 A Python library for querying the RateMyProfessors GraphQL API. Search for professors, fetch their ratings, and compute quality signals from the data.
 
