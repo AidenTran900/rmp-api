@@ -11,10 +11,10 @@
 /* ── Brand tokens ────────────────────────────────────────── */
 :root {
   --rmp-ink:      #04080f;   /* Ink Black          */
-  --rmp-ink-2:    #1b2b43;   /* dark navy (70% ink + 30% glaucous) */
-  --rmp-blue:     #507dbc;   /* Glaucous           */
-  --rmp-blue-dk:  #3a5d8a;   /* Glaucous −20L      */
-  --rmp-powder:   #a1c6ea;   /* Powder Blue */
+  --rmp-ink-2:    #0f2e5c;   /* dark navy (70% ink + 30% glaucous) */
+  --rmp-blue:     #2462ba;   /* Glaucous           */
+  --rmp-blue-dk:  #1160aa;   /* Glaucous −20L      */
+  --rmp-powder:   #348fea;   /* Powder Blue */
   --rmp-pale:     #bbd1ea;   /* Pale Sky    */
   --rmp-alabaster:#dae3e5;   /* Alabaster Grey */
   --rmp-glow:     rgba(80, 125, 188, 0.20);
@@ -50,7 +50,24 @@
   --md-accent-fg-color:              var(--rmp-powder);
   --md-accent-fg-color--transparent: rgba(161, 198, 234, 0.12);
   --md-default-bg-color:             var(--rmp-ink);
-  --md-code-bg-color:                #0d1520;
+
+  /* ── Code block: dark surface ─────────────────────────── */
+  --md-code-bg-color:                #0b1119;
+  --md-code-fg-color:                #e6edf3;
+
+  /* ── Syntax token colors (GitHub Dark-inspired, high contrast) */
+  --md-code-hl-keyword-color:        #ff7b72;   /* red    — def, for, if    */
+  --md-code-hl-string-color:         #a5d6ff;   /* sky    — "literals"      */
+  --md-code-hl-comment-color:        #6e8191;   /* muted  — # comments      */
+  --md-code-hl-number-color:         #79c0ff;   /* blue   — 42, 3.14        */
+  --md-code-hl-operator-color:       #ff7b72;   /* red    — +, =, ->        */
+  --md-code-hl-punctuation-color:    #c9d1d9;   /* light  — (), [], {}      */
+  --md-code-hl-name-color:           #e6edf3;   /* white  — plain names     */
+  --md-code-hl-generic-color:        #e6edf3;
+  --md-code-hl-variable-color:       #ffa657;   /* orange — variables       */
+  --md-code-hl-function-color:       #d2a8ff;   /* violet — function names  */
+  --md-code-hl-special-color:        #7ee787;   /* green  — decorators, cls */
+  --md-code-hl-constant-color:       #79c0ff;   /* blue   — True, None      */
 }
 
 /* ── Typography: Montserrat headings ─────────────────────── */
@@ -87,24 +104,26 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Sidebar nav items: staggered slide-in ───────────────── */
-.md-sidebar--primary .md-nav__item {
-  animation: rmp-slide 260ms var(--rmp-ease-out) both;
-}
-
+/* ── Sidebar nav items: staggered slide-in (desktop only) ── */
 @keyframes rmp-slide {
   from { opacity: 0; transform: translateX(-5px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 
-.md-sidebar--primary .md-nav__item:nth-child(1) { animation-delay:   0ms; }
-.md-sidebar--primary .md-nav__item:nth-child(2) { animation-delay:  30ms; }
-.md-sidebar--primary .md-nav__item:nth-child(3) { animation-delay:  60ms; }
-.md-sidebar--primary .md-nav__item:nth-child(4) { animation-delay:  90ms; }
-.md-sidebar--primary .md-nav__item:nth-child(5) { animation-delay: 120ms; }
-.md-sidebar--primary .md-nav__item:nth-child(6) { animation-delay: 150ms; }
-.md-sidebar--primary .md-nav__item:nth-child(7) { animation-delay: 180ms; }
-.md-sidebar--primary .md-nav__item:nth-child(8) { animation-delay: 210ms; }
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary .md-nav__item {
+    animation: rmp-slide 260ms var(--rmp-ease-out) both;
+  }
+
+  .md-sidebar--primary .md-nav__item:nth-child(1) { animation-delay:   0ms; }
+  .md-sidebar--primary .md-nav__item:nth-child(2) { animation-delay:  30ms; }
+  .md-sidebar--primary .md-nav__item:nth-child(3) { animation-delay:  60ms; }
+  .md-sidebar--primary .md-nav__item:nth-child(4) { animation-delay:  90ms; }
+  .md-sidebar--primary .md-nav__item:nth-child(5) { animation-delay: 120ms; }
+  .md-sidebar--primary .md-nav__item:nth-child(6) { animation-delay: 150ms; }
+  .md-sidebar--primary .md-nav__item:nth-child(7) { animation-delay: 180ms; }
+  .md-sidebar--primary .md-nav__item:nth-child(8) { animation-delay: 210ms; }
+}
 
 /* ── Nav links: color transition only ───────────────────── */
 .md-nav__link {
@@ -161,20 +180,10 @@
   box-shadow: 0 0 0 3px var(--rmp-glow);
 }
 
-/* ── Code blocks: hover lift ─────────────────────────────── */
+/* ── Code blocks ─────────────────────────────────────────── */
 .md-typeset .highlight,
 .md-typeset pre {
-  transition: box-shadow 240ms var(--rmp-ease),
-              transform 240ms var(--rmp-ease);
   border-radius: 6px;
-  will-change: box-shadow, transform;
-}
-
-.md-typeset .highlight:hover,
-.md-typeset pre:hover {
-  box-shadow: 0 4px 20px var(--rmp-glow-sm),
-              0 1px 6px rgba(4, 8, 15, 0.06);
-  transform: translateY(-1px);
 }
 
 /* ── Inline code: subtle tint on hover ───────────────────── */

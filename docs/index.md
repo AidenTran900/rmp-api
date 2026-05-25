@@ -7,6 +7,7 @@ A Python library for querying the RateMyProfessors GraphQL API. Search for profe
 
 ## Install
 
+[pypi.org/project/rmp-api/](https://pypi.org/project/rmp-api/)
 ```bash
 pip install rmp-api
 ```
