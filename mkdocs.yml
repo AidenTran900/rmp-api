@@ -1,5 +1,6 @@
 site_name: rmp-api
 site_description: Python wrapper for the RateMyProfessors GraphQL API
+site_url: https://docs.aidentran.dev/rmp-api/
 repo_url: https://github.com/AidenTran900/rmp-api
 repo_name: AidenTran900/rmp-api
 
