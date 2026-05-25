@@ -267,7 +267,7 @@ def get_ratings_page(
 
 def get_all_ratings(
     professor_id: str,
-    course_filter: str | None = None,
+    course_filter: str | list[str] | None = None,
     page_size: int = 20,
 ) -> list[Rating]:
     """
@@ -275,13 +275,23 @@ def get_all_ratings(
 
     Args:
         professor_id: Base64-encoded RMP professor node ID.
-        course_filter: Optional course code to filter ratings.
+        course_filter: Optional course code(s) to filter ratings. Accepts a
+            single string (e.g. ``"CS61A"``), a list of strings
+            (e.g. ``["CS61A", "CS61B"]``), or ``None`` for all ratings.
+            When a list is given, one paginated request sequence is made per
+            course and results are concatenated in the same order.
         page_size: Ratings fetched per page (default ``20``).
 
     Returns:
         Combined list of :class:`~models.Rating` objects across all pages.
         Empty list if the first page fails.
     """
+    if isinstance(course_filter, list):
+        all_ratings = []
+        for course in course_filter:
+            all_ratings.extend(get_all_ratings(professor_id, course_filter=course, page_size=page_size))
+        return all_ratings
+
     all_ratings = []
     cursor = None
 
@@ -321,7 +331,11 @@ def get_courses(professor_id: str) -> list[dict] | None:
         return None
 
 
-def get_representative_ratings(professor_id: str, n: int = 12) -> list[Rating]:
+def get_representative_ratings(
+    professor_id: str,
+    n: int = 12,
+    course_filter: str | list[str] | None = None,
+) -> list[Rating]:
     """
     Return ``n`` ratings evenly sampled across all available ratings.
 
@@ -332,11 +346,13 @@ def get_representative_ratings(professor_id: str, n: int = 12) -> list[Rating]:
     Args:
         professor_id: Base64-encoded RMP professor node ID.
         n: Number of representative ratings to return (default ``12``).
+        course_filter: Optional course code(s) to restrict ratings. Accepts a
+            single string or list of strings (e.g. ``["CS61A", "CS61B"``).
 
     Returns:
         List of up to ``n`` :class:`~models.Rating` objects.
     """
-    all_ratings = get_all_ratings(professor_id)
+    all_ratings = get_all_ratings(professor_id, course_filter=course_filter)
     if len(all_ratings) <= n:
         return all_ratings
     step = len(all_ratings) // n
