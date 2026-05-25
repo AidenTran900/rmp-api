@@ -1,4 +1,4 @@
-# rate-my-prof-api
+# Rate My Professor API
 
 Python wrapper for the RateMyProfessors GraphQL API. Scrapes professor ratings, individual reviews, and school info.
 
