@@ -5,7 +5,7 @@ Main entry point for professor scoring. Orchestrates all signals into a
 single ProfessorScore with a composite score.
 """
 
-from ..models import ProfessorComparison, ProfessorScore, Rating, ScoreTimeline, SplitScore
+from ..models import ProfessorComparison, ProfessorScore, Rating, ScoreTimeline, SortBy, SplitScore, TimePeriod
 from .helpers import _overall, _parse_date
 from .presets import WEIGHT_PRESETS
 from .signals import (
@@ -114,7 +114,7 @@ def compute_score(
 
 def compute_score_over_time(
     ratings: list[Rating],
-    period: str = "year",
+    period: TimePeriod | str = TimePeriod.YEAR,
     weights: dict[str, float] | None = None,
     half_life_days: float = 365.0,
 ) -> ScoreTimeline:
@@ -126,12 +126,12 @@ def compute_score_over_time(
 
     Args:
         ratings: Output of :func:`~client.get_all_ratings` or similar.
-        period: Bucketing granularity. One of:
+        period: Bucketing granularity. Use :class:`~models.TimePeriod` members
+            or the equivalent plain strings (``StrEnum`` — both work):
 
-            * ``"year"``     — annual buckets, labelled ``"2023"``.
-            * ``"semester"`` — half-year buckets, labelled ``"2023-Spring"``
-              (Jan–Jun) or ``"2023-Fall"`` (Jul–Dec).
-            * ``"quarter"``  — quarterly buckets, labelled ``"2023-Q1"`` … ``"2023-Q4"``.
+            * :attr:`~models.TimePeriod.YEAR` / ``"year"``         — ``"2023"``.
+            * :attr:`~models.TimePeriod.SEMESTER` / ``"semester"`` — ``"2023-Spring"`` / ``"2023-Fall"``.
+            * :attr:`~models.TimePeriod.QUARTER` / ``"quarter"``   — ``"2023-Q1"`` … ``"2023-Q4"``.
 
         weights: Passed through to each :func:`compute_score` call.
         half_life_days: Recency decay half-life passed to each :func:`compute_score` call.
@@ -142,11 +142,14 @@ def compute_score_over_time(
         Returns an empty timeline if no ratings have parseable dates.
 
     Raises:
-        ValueError: If ``period`` is not one of ``"year"``, ``"semester"``, ``"quarter"``.
+        ValueError: If ``period`` is not a valid :class:`~models.TimePeriod` value.
     """
-    valid_periods = {"year", "semester", "quarter"}
-    if period not in valid_periods:
-        raise ValueError(f"period must be one of {valid_periods!r}, got {period!r}")
+    try:
+        period = TimePeriod(period)
+    except ValueError:
+        raise ValueError(
+            f"period must be one of {[m.value for m in TimePeriod]!r}, got {period!r}"
+        )
 
     _SEMESTER_ORDER = {"Spring": 0, "Fall": 1}
 
@@ -154,20 +157,20 @@ def compute_score_over_time(
         dt = _parse_date(date_str)
         if dt is None:
             return None
-        if period == "year":
+        if period is TimePeriod.YEAR:
             return (dt.year,)
-        if period == "semester":
+        if period is TimePeriod.SEMESTER:
             half = "Spring" if dt.month <= 6 else "Fall"
             # use numeric ordinal so sorting is chronological, not alphabetical
             return (dt.year, _SEMESTER_ORDER[half], half)
-        # quarter
+        # QUARTER
         q = (dt.month - 1) // 3 + 1
         return (dt.year, q)
 
     def _bucket_label(key: tuple) -> str:
-        if period == "year":
+        if period is TimePeriod.YEAR:
             return str(key[0])
-        if period == "semester":
+        if period is TimePeriod.SEMESTER:
             # key = (year, ordinal, name)
             return f"{key[0]}-{key[2]}"
         return f"{key[0]}-Q{key[1]}"
@@ -251,26 +254,14 @@ def compute_split_score(
     )
 
 
-#: Numeric :class:`~models.ProfessorScore` fields valid for use as ``sort_by``
-#: in :func:`compare_professors`.
-SORTABLE_FIELDS: frozenset[str] = frozenset({
-    "composite_score",
-    "raw_avg_rating",
-    "avg_clarity",
-    "avg_helpfulness",
-    "avg_difficulty",
-    "recency_weighted_rating",
-    "reliability_score",
-    "easiness_score",
-    "would_take_again_pct",
-    "review_velocity",
-    "num_ratings",
-})
+#: Frozenset of valid ``sort_by`` string values — mirrors :class:`~models.SortBy` members.
+#: Kept for backward-compat introspection; prefer :class:`~models.SortBy` in new code.
+SORTABLE_FIELDS: frozenset[str] = frozenset(m.value for m in SortBy)
 
 
 def compare_professors(
     professors: dict[str, list[Rating]] | list[tuple[str, list[Rating]]],
-    sort_by: str = "composite_score",
+    sort_by: SortBy | str = SortBy.COMPOSITE_SCORE,
     weights: dict[str, float] | None = None,
     half_life_days: float = 365.0,
 ) -> ProfessorComparison:
@@ -287,17 +278,12 @@ def compare_professors(
             * ``list[tuple[str, list[Rating]]]`` — ``[("Prof A", ratings_a), ...]``
               (preserves insertion order when labels duplicate).
 
-        sort_by: :class:`ProfessorScore` field to rank by. Higher is always
-            considered better — to compare by difficulty (lower = easier),
-            use ``"easiness_score"`` instead of ``"avg_difficulty"``.
-            Valid values (see :data:`SORTABLE_FIELDS`):
-
-            ``"composite_score"`` *(default)*, ``"raw_avg_rating"``,
-            ``"avg_clarity"``, ``"avg_helpfulness"``, ``"avg_difficulty"``,
-            ``"recency_weighted_rating"``, ``"reliability_score"``,
-            ``"easiness_score"``, ``"would_take_again_pct"``,
-            ``"review_velocity"``, ``"num_ratings"``.
-
+        sort_by: :class:`~models.ProfessorScore` field to rank by. Use
+            :class:`~models.SortBy` members or the equivalent plain strings
+            (``StrEnum`` — both work). Higher is always ranked first — to rank
+            by easiness (lower difficulty = better) use
+            :attr:`~models.SortBy.EASINESS_SCORE` instead of
+            :attr:`~models.SortBy.AVG_DIFFICULTY`.
         weights: Weight dict passed to each :func:`compute_score` call.
             Use a :data:`WEIGHT_PRESETS` entry or a custom dict.
             Only affects ``composite_score``; all other signals are
@@ -310,7 +296,7 @@ def compare_professors(
 
         * ``ranking`` — list of ``(label, ProfessorScore)`` sorted best → worst.
         * ``scores`` — ``{label: ProfessorScore}`` for direct lookup.
-        * ``sort_by`` — the field used for ranking.
+        * ``sort_by`` — the resolved :class:`~models.SortBy` value used for ranking.
         * ``best`` / ``worst`` — labels of the top and bottom professors.
         * ``deltas`` — ``{label: float}`` difference from the best value
           on the ``sort_by`` field (best = ``0.0``, others ``<= 0.0``).
@@ -318,11 +304,13 @@ def compare_professors(
         Returns a comparison with empty ``ranking`` if ``professors`` is empty.
 
     Raises:
-        ValueError: If ``sort_by`` is not in :data:`SORTABLE_FIELDS`.
+        ValueError: If ``sort_by`` is not a valid :class:`~models.SortBy` value.
     """
-    if sort_by not in SORTABLE_FIELDS:
+    try:
+        sort_by = SortBy(sort_by)
+    except ValueError:
         raise ValueError(
-            f"sort_by must be one of {sorted(SORTABLE_FIELDS)!r}, got {sort_by!r}"
+            f"sort_by must be one of {[m.value for m in SortBy]!r}, got {sort_by!r}"
         )
 
     # Normalise input to list of (label, ratings) pairs

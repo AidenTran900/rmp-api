@@ -10,6 +10,7 @@ from .score import (
     compute_score_over_time,
     compute_split_score,
 )
+from ..models import SortBy, TimePeriod
 from .signals import (
     compute_difficulty_histogram,
     compute_easiness_score,
@@ -25,6 +26,8 @@ __all__ = [
     "compute_score_over_time",
     "compare_professors",
     "SORTABLE_FIELDS",
+    "SortBy",
+    "TimePeriod",
     "WEIGHT_PRESETS",
     "compute_recency_weighted_rating",
     "compute_reliability_score",

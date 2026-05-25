@@ -5,6 +5,63 @@ shared dataclasses for the RMP API wrapper.
 """
 
 from dataclasses import dataclass, field
+from enum import StrEnum
+
+
+class TimePeriod(StrEnum):
+    """
+    Time bucketing granularity for :func:`~scoring.compute_score_over_time`.
+
+    Members compare equal to their string values, so plain strings still work:
+    ``TimePeriod.YEAR == "year"`` is ``True``.
+
+    Members:
+        YEAR:     Annual buckets — ``"2023"``.
+        SEMESTER: Half-year buckets — ``"2023-Spring"`` / ``"2023-Fall"``.
+        QUARTER:  Quarterly buckets — ``"2023-Q1"`` … ``"2023-Q4"``.
+    """
+
+    YEAR     = "year"
+    SEMESTER = "semester"
+    QUARTER  = "quarter"
+
+
+class SortBy(StrEnum):
+    """
+    :class:`~models.ProfessorScore` field to rank by in
+    :func:`~scoring.compare_professors`.
+
+    Members compare equal to their string values, so plain strings still work:
+    ``SortBy.COMPOSITE_SCORE == "composite_score"`` is ``True``.
+
+    Higher values are always ranked first. To rank by easiness (lower difficulty
+    = better), use :attr:`EASINESS_SCORE` rather than :attr:`AVG_DIFFICULTY`.
+
+    Members:
+        COMPOSITE_SCORE:        Weighted composite (default).
+        RAW_AVG_RATING:         Mean of ``(helpful + clarity) / 2``.
+        AVG_CLARITY:            Mean clarity rating.
+        AVG_HELPFULNESS:        Mean helpfulness rating.
+        AVG_DIFFICULTY:         Mean difficulty (higher = harder).
+        RECENCY_WEIGHTED_RATING: Exponential-decay-weighted quality.
+        RELIABILITY_SCORE:      Bayesian confidence from sample size.
+        EASINESS_SCORE:         Inverse of average difficulty (higher = easier).
+        WOULD_TAKE_AGAIN_PCT:   Fraction who would take again.
+        REVIEW_VELOCITY:        Reviews per year (2-year window).
+        NUM_RATINGS:            Total rating count.
+    """
+
+    COMPOSITE_SCORE          = "composite_score"
+    RAW_AVG_RATING           = "raw_avg_rating"
+    AVG_CLARITY              = "avg_clarity"
+    AVG_HELPFULNESS          = "avg_helpfulness"
+    AVG_DIFFICULTY           = "avg_difficulty"
+    RECENCY_WEIGHTED_RATING  = "recency_weighted_rating"
+    RELIABILITY_SCORE        = "reliability_score"
+    EASINESS_SCORE           = "easiness_score"
+    WOULD_TAKE_AGAIN_PCT     = "would_take_again_pct"
+    REVIEW_VELOCITY          = "review_velocity"
+    NUM_RATINGS              = "num_ratings"
 
 
 @dataclass

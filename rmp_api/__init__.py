@@ -14,7 +14,7 @@ from .client import (
     search_professors,
     search_schools,
 )
-from .models import ProfessorComparison, ProfessorRating, ProfessorScore, Rating, ScoreTimeline, SplitScore
+from .models import ProfessorComparison, ProfessorRating, ProfessorScore, Rating, ScoreTimeline, SortBy, SplitScore, TimePeriod
 from .scoring import (
     SORTABLE_FIELDS,
     WEIGHT_PRESETS,
@@ -48,4 +48,6 @@ __all__ = [
     "ProfessorComparison",
     "WEIGHT_PRESETS",
     "SORTABLE_FIELDS",
+    "SortBy",
+    "TimePeriod",
 ]
