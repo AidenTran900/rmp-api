@@ -10,6 +10,7 @@ Exports:
     get_ratings_page(professor_id, ...) -> tuple[list[Rating], bool, str | None]
     get_all_ratings(professor_id, ...) -> list[Rating]
     get_representative_ratings(professor_id, n) -> list[Rating]
+    get_courses(professor_id) -> list[dict] | None
 """
 
 from pathlib import Path
@@ -45,6 +46,7 @@ _QUERIES_DIR = Path(__file__).parent / "queries"
 TEACHER_QUERY = (_QUERIES_DIR / "teacher_search.graphql").read_text()
 SCHOOL_QUERY = (_QUERIES_DIR / "school_search.graphql").read_text()
 RATINGS_LIST_QUERY = (_QUERIES_DIR / "rating_list.graphql").read_text()
+TEACHER_COURSES_QUERY = (_QUERIES_DIR / "teacher_courses.graphql").read_text()
 
 
 
@@ -296,6 +298,27 @@ def get_all_ratings(
             break
 
     return all_ratings
+
+
+def get_courses(professor_id: str) -> list[dict] | None:
+    """
+    Fetch all courses a professor has taught, as listed in the RMP review filter.
+
+    Args:
+        professor_id: Base64-encoded RMP professor node ID.
+
+    Returns:
+        List of dicts with keys ``courseName`` (str) and ``courseCount`` (int),
+        sorted by ``courseCount`` descending.
+        ``None`` on request or parsing failure.
+    """
+    try:
+        data = _graphql(TEACHER_COURSES_QUERY, {"id": professor_id})
+        codes = data["data"]["node"]["courseCodes"]
+        return sorted(codes, key=lambda c: c["courseCount"], reverse=True)
+    except Exception as e:
+        print(f"Error fetching courses: {e}")
+        return None
 
 
 def get_representative_ratings(professor_id: str, n: int = 12) -> list[Rating]:
