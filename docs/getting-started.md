@@ -3,7 +3,13 @@
 ## Installation
 
 ```bash
-pip install git+https://github.com/AidenTran900/rmp-api.git
+pip install rmp-api
+```
+
+Or with `uv`:
+
+```bash
+uv add rmp-api
 ```
 
 Or clone and install locally for development:
