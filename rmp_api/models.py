@@ -4,6 +4,63 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 
 
+@dataclass
+class SchoolResult:
+    """
+    A school returned by :func:`~client.search_schools`.
+
+    Attributes:
+        id: Base64-encoded RMP node ID. Pass this as ``school_id`` to other functions.
+        legacy_id: Legacy numeric school ID. Only useful for building URLs
+            like ``https://www.ratemyprofessors.com/school/{legacy_id}``.
+        name: Full school name (e.g. ``"University of California, Berkeley"``).
+        city: City the school is located in.
+        state: State or province abbreviation.
+        num_ratings: Total number of professor ratings at this school.
+        avg_rating: Average professor rating across the school (0.0-5.0).
+    """
+
+    id: str
+    legacy_id: int
+    name: str
+    city: str
+    state: str
+    num_ratings: int
+    avg_rating: float
+
+
+@dataclass
+class ProfessorResult:
+    """
+    A professor returned by :func:`~client.search_professors`.
+
+    Attributes:
+        id: Base64-encoded RMP node ID. Pass this as ``professor_id`` to other functions.
+        legacy_id: Legacy numeric professor ID. Only useful for building URLs
+            like ``https://www.ratemyprofessors.com/professor/{legacy_id}``.
+        first_name: Professor's first name.
+        last_name: Professor's last name.
+        department: Academic department string (e.g. ``"Computer Science"``).
+        school_name: Name of the school this result is associated with.
+        avg_rating: Mean overall rating on this professor's RMP profile (0.0-5.0).
+        avg_difficulty: Mean difficulty rating (0.0-5.0).
+        num_ratings: Total number of submitted ratings.
+        would_take_again_percent: Percentage of students who would take again (0.0-100.0).
+            ``-1`` if not enough data.
+    """
+
+    id: str
+    legacy_id: int
+    first_name: str
+    last_name: str
+    department: str
+    school_name: str
+    avg_rating: float
+    avg_difficulty: float
+    num_ratings: int
+    would_take_again_percent: float
+
+
 class TimePeriod(StrEnum):
     """
     Time bucketing granularity for :func:`~scoring.compute_score_over_time`.

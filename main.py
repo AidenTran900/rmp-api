@@ -9,11 +9,11 @@ from rmp_api import get_all_ratings, get_ratings_page, search_professors, search
 if __name__ == "__main__":
     schools = search_schools("University of California Berkeley")
     if schools:
-        school_id = schools[0]["node"]["id"]
+        school_id = schools[0].id
 
         results = search_professors("Jean Frechet", school_id)
         if results:
-            professor_id = results[0]["node"]["id"]
+            professor_id = results[0].id
 
             # Fetch one page of ratings
             ratings, has_next, end_cursor = get_ratings_page(professor_id, count=10)

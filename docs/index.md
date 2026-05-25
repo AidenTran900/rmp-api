@@ -21,10 +21,10 @@ Requires Python 3.10+.
 from rmp_api import search_schools, search_professors, get_all_ratings, compute_score
 
 schools = search_schools("UC Berkeley")
-school_id = schools[0]["node"]["id"]
+school_id = schools[0].id
 
 professors = search_professors("John DeNero", school_id)
-professor_id = professors[0]["node"]["id"]
+professor_id = professors[0].id
 
 ratings = get_all_ratings(professor_id)
 score = compute_score(ratings)

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import requests
 
-from .models import ProfessorRating, Rating
+from .models import ProfessorRating, ProfessorResult, Rating, SchoolResult
 
 
 # ---------------------------------------------------------------------------
@@ -104,7 +104,7 @@ def _parse_rating(edge: dict) -> Rating:
 # ---------------------------------------------------------------------------
 
 @lru_cache(maxsize=128)
-def search_schools(school_name: str) -> list[dict] | None:
+def search_schools(school_name: str) -> list[SchoolResult] | None:
     """
     Search for schools by name.
 
@@ -112,13 +112,24 @@ def search_schools(school_name: str) -> list[dict] | None:
         school_name: Full or partial school name to search.
 
     Returns:
-        List of school edge dicts from the GraphQL response, each containing
-        a ``node`` with school metadata (id, name, city, etc.).
+        List of :class:`~models.SchoolResult` objects ranked by relevance.
         ``None`` on request or parsing failure.
     """
     try:
         data = _graphql(SCHOOL_QUERY, {"query": {"text": school_name}})
-        return data["data"]["newSearch"]["schools"]["edges"]
+        edges = data["data"]["newSearch"]["schools"]["edges"]
+        return [
+            SchoolResult(
+                id=e["node"]["id"],
+                legacy_id=e["node"]["legacyId"],
+                name=e["node"]["name"],
+                city=e["node"]["city"],
+                state=e["node"]["state"],
+                num_ratings=e["node"]["numRatings"],
+                avg_rating=e["node"]["avgRatingRounded"],
+            )
+            for e in edges
+        ]
     except Exception as e:
         print(f"Error searching school: {e}")
         return None
@@ -128,18 +139,17 @@ def search_schools(school_name: str) -> list[dict] | None:
 def search_professors(
     professor_name: str,
     school_id: str,
-) -> list[dict] | None:
+) -> list[ProfessorResult] | None:
     """
     Search for professors by name within a school.
 
     Args:
         professor_name: Full or partial professor name to search.
         school_id: Base64-encoded RMP school node ID (e.g. ``"U2Nob29sLTEyMw=="``)
-            or legacy numeric string accepted by the GraphQL API.
+            from :func:`search_schools`.
 
     Returns:
-        List of teacher edge dicts from the GraphQL response, each containing
-        a ``node`` with professor metadata (id, name, avgRating, etc.).
+        List of :class:`~models.ProfessorResult` objects ranked by relevance.
         ``None`` on request or parsing failure.
     """
     try:
@@ -156,7 +166,22 @@ def search_professors(
                 "includeSchoolFilter": True,
             },
         )
-        return data["data"]["search"]["teachers"]["edges"]
+        edges = data["data"]["search"]["teachers"]["edges"]
+        return [
+            ProfessorResult(
+                id=e["node"]["id"],
+                legacy_id=e["node"]["legacyId"],
+                first_name=e["node"]["firstName"],
+                last_name=e["node"]["lastName"],
+                department=e["node"]["department"],
+                school_name=e["node"]["school"]["name"],
+                avg_rating=e["node"]["avgRating"],
+                avg_difficulty=e["node"]["avgDifficulty"],
+                num_ratings=e["node"]["numRatings"],
+                would_take_again_percent=e["node"]["wouldTakeAgainPercent"],
+            )
+            for e in edges
+        ]
     except Exception as e:
         print(f"Error searching professors: {e}")
         return None
@@ -195,15 +220,15 @@ def get_professor_summary(
             link="",
         )
 
-    node = results[0]["node"]
+    prof = results[0]
     return ProfessorRating(
-        avg_rating=node["avgRating"],
-        avg_difficulty=node["avgDifficulty"],
-        would_take_again_percent=node["wouldTakeAgainPercent"],
-        num_ratings=node["numRatings"],
-        formatted_name=f"{node['firstName']} {node['lastName']}",
-        department=node["department"],
-        link=f"https://www.ratemyprofessors.com/professor/{node['legacyId']}",
+        avg_rating=prof.avg_rating,
+        avg_difficulty=prof.avg_difficulty,
+        would_take_again_percent=prof.would_take_again_percent,
+        num_ratings=prof.num_ratings,
+        formatted_name=f"{prof.first_name} {prof.last_name}",
+        department=prof.department,
+        link=f"https://www.ratemyprofessors.com/professor/{prof.legacy_id}",
     )
 
 

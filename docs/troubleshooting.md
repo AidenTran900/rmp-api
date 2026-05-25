@@ -34,8 +34,7 @@ If the school search works but the professor search returns nothing, the profess
 ```python
 results = search_professors("Smith", school_id)
 for result in results:
-    node = result["node"]
-    print(node["firstName"], node["lastName"], node["department"])
+    print(result.first_name, result.last_name, result.department)
 ```
 
 Pick the correct entry by index or by checking the department.
@@ -84,14 +83,11 @@ print(score.would_take_again_pct)  # 0.0 if no responses, not -1
 
 **Likely causes:**
 
-1. **Wrong ID type.** You passed `node["legacyId"]` (an integer) instead of `node["id"]` (a base64 string).
+1. **Wrong ID.** Make sure you're passing `professor.id` (the `ProfessorResult` attribute), not something else like an integer or a manually constructed string.
 
    ```python
-   # Wrong
-   professor_id = results[0]["node"]["legacyId"]  # 123456 -- won't work
-
-   # Correct
-   professor_id = results[0]["node"]["id"]         # "VGVhY2hlci0xMjM0NTY="
+   results = search_professors("Some Prof", school_id)
+   professor_id = results[0].id   # correct -- base64 string from ProfessorResult
    ```
 
 2. **Network failure.** The function returns `[]` on request errors. Check if any error messages were printed to stdout.
@@ -133,8 +129,6 @@ For very large batches (hundreds of professors), consider 1-2 second delays. The
 **Cause:** The library catches all exceptions from the network layer and returns safe sentinel values rather than raising. The error is printed to stdout.
 
 **Fix:** Check your network connection. If the issue is intermittent, it's likely a transient failure from the RMP server. Retry after a few seconds.
-
-If you want to handle errors in your own code rather than relying on print output, you can call the underlying `_graphql` function directly, but that's not part of the public API and may change.
 
 ---
 

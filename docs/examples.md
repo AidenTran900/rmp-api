@@ -12,7 +12,7 @@ The simplest thing you can do: search by name and get their stats.
 from rmp_api import search_schools, get_professor_summary
 
 schools = search_schools("UCLA")
-school_id = schools[0]["node"]["id"]
+school_id = schools[0].id
 
 summary = get_professor_summary("Paul Eggert", school_id)
 
@@ -35,14 +35,14 @@ Fetch ratings for both and run them through `compare_professors`. By default it 
 from rmp_api import search_schools, search_professors, get_all_ratings, compare_professors
 
 schools = search_schools("Stanford")
-school_id = schools[0]["node"]["id"]
+school_id = schools[0].id
 
-def get_id(name):
+def get_professor_id(name):
     results = search_professors(name, school_id)
-    return results[0]["node"]["id"]
+    return results[0].id
 
-ratings_a = get_all_ratings(get_id("Andrew Ng"))
-ratings_b = get_all_ratings(get_id("Daphne Koller"))
+ratings_a = get_all_ratings(get_professor_id("Andrew Ng"))
+ratings_b = get_all_ratings(get_professor_id("Daphne Koller"))
 
 comparison = compare_professors({
     "Andrew Ng": ratings_a,
@@ -77,9 +77,9 @@ Limit `get_all_ratings` to a specific course code. Useful when a professor teach
 from rmp_api import search_schools, search_professors, get_all_ratings, compute_score
 
 schools = search_schools("UC Berkeley")
-school_id = schools[0]["node"]["id"]
+school_id = schools[0].id
 
-professor_id = search_professors("Dan Garcia", school_id)[0]["node"]["id"]
+professor_id = search_professors("Dan Garcia", school_id)[0].id
 
 # Only ratings for CS61A
 ratings = get_all_ratings(professor_id, course_filter="CS61A")
@@ -102,9 +102,9 @@ ratings = get_all_ratings(professor_id, course_filter=["CS61A", "CS61C"])
 from rmp_api import search_schools, search_professors, get_courses
 
 schools = search_schools("MIT")
-school_id = schools[0]["node"]["id"]
+school_id = schools[0].id
 
-professor_id = search_professors("Erik Demaine", school_id)[0]["node"]["id"]
+professor_id = search_professors("Erik Demaine", school_id)[0].id
 courses = get_courses(professor_id)
 
 for course in courses[:5]:
@@ -123,9 +123,9 @@ Results are sorted by rating count, most-reviewed first.
 from rmp_api import search_schools, search_professors, get_all_ratings, compute_score_over_time, TimePeriod
 
 schools = search_schools("UC Berkeley")
-school_id = schools[0]["node"]["id"]
+school_id = schools[0].id
 
-professor_id = search_professors("John DeNero", school_id)[0]["node"]["id"]
+professor_id = search_professors("John DeNero", school_id)[0].id
 ratings = get_all_ratings(professor_id)
 
 timeline = compute_score_over_time(ratings, period=TimePeriod.YEAR)
@@ -147,9 +147,9 @@ Use `TimePeriod.SEMESTER` or `TimePeriod.QUARTER` for finer granularity.
 from rmp_api import search_schools, search_professors, get_all_ratings, compute_split_score
 
 schools = search_schools("UC Berkeley")
-school_id = schools[0]["node"]["id"]
+school_id = schools[0].id
 
-professor_id = search_professors("John DeNero", school_id)[0]["node"]["id"]
+professor_id = search_professors("John DeNero", school_id)[0].id
 ratings = get_all_ratings(professor_id)
 
 split = compute_split_score(ratings)
@@ -169,9 +169,9 @@ Filter ratings whose comment text contains a given word or phrase.
 from rmp_api import search_schools, search_professors, get_all_ratings, filter_ratings_by_keywords
 
 schools = search_schools("Harvard")
-school_id = schools[0]["node"]["id"]
+school_id = schools[0].id
 
-professor_id = search_professors("Michael Sandel", school_id)[0]["node"]["id"]
+professor_id = search_professors("Michael Sandel", school_id)[0].id
 ratings = get_all_ratings(professor_id)
 
 # Find ratings that mention "exam" or "midterm"
@@ -199,7 +199,7 @@ score = compute_score(ratings, weights=WEIGHT_PRESETS["overall"])
 
 # Custom weights -- values should sum to ~1.0
 score = compute_score(ratings, weights={
-    "recency_rating":  0.5,
+    "recency_rating":   0.5,
     "would_take_again": 0.3,
     "easiness":         0.1,
     "reliability":      0.1,

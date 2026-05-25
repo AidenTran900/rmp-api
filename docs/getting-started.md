@@ -28,13 +28,13 @@ The typical flow is: find a school, find a professor at that school, fetch their
 from rmp_api import search_schools
 
 results = search_schools("UC Berkeley")
-school = results[0]["node"]
+school = results[0]
 
-print(school["name"])  # "University of California, Berkeley"
-school_id = school["id"]  # "U2Nob29sLTEyMw=="
+print(school.name)  # "University of California, Berkeley"
+school_id = school.id  # "U2Nob29sLTEyMw=="
 ```
 
-`search_schools` returns a list of matching schools ranked by relevance. Use `results[0]` for the top match. The `id` field is what you need for the next step.
+`search_schools` returns a list of `SchoolResult` objects ranked by relevance. Use `school.id` for professor searches. `school.legacy_id` is only needed if you want to build a profile URL.
 
 ### 2. Find the professor
 
@@ -42,13 +42,13 @@ school_id = school["id"]  # "U2Nob29sLTEyMw=="
 from rmp_api import search_professors
 
 results = search_professors("John DeNero", school_id)
-professor = results[0]["node"]
+professor = results[0]
 
-print(professor["firstName"], professor["lastName"])  # John DeNero
-professor_id = professor["id"]  # "VGVhY2hlci0xMjM0NTY="
+print(professor.first_name, professor.last_name)  # John DeNero
+professor_id = professor.id  # "VGVhY2hlci0xMjM0NTY="
 ```
 
-Both IDs are base64-encoded strings. They look a bit odd but that's what the API returns. Pass them as-is.
+`search_professors` returns a list of `ProfessorResult` objects. Use `professor.id` for the next step.
 
 ### 3. Fetch their ratings
 
@@ -86,7 +86,7 @@ If you only need the aggregated numbers from RMP's own profile page (average rat
 from rmp_api import search_schools, get_professor_summary
 
 schools = search_schools("UC Berkeley")
-school_id = schools[0]["node"]["id"]
+school_id = schools[0].id
 
 summary = get_professor_summary("John DeNero", school_id)
 
@@ -103,16 +103,6 @@ Use `get_professor_summary` when you just need a quick overview. Use `get_all_ra
 
 ## Common mistakes
 
-**Using the wrong ID type.** Every search result has two IDs: `node["id"]` (base64 string) and `node["legacyId"]` (integer). The functions `get_all_ratings`, `get_ratings_page`, and `get_courses` require the base64 string ID. `legacyId` is only useful for constructing profile URLs manually.
-
-```python
-# Correct
-professor_id = results[0]["node"]["id"]           # "VGVhY2hlci0xMjM0NTY="
-
-# Wrong -- will return no results or raise an error
-professor_id = results[0]["node"]["legacyId"]     # 123456
-```
-
 **Not checking if the search returned anything.** Both `search_schools` and `search_professors` return `None` on network failure and an empty list when nothing matches. Check before indexing.
 
 ```python
@@ -120,7 +110,7 @@ results = search_professors("Some Prof", school_id)
 if not results:
     print("No match found")
 else:
-    professor_id = results[0]["node"]["id"]
+    professor_id = results[0].id
 ```
 
 **Trusting `-1` as a valid rating.** `get_professor_summary` returns `-1` for numeric fields when no professor is found. Always check `summary.num_ratings > 0` before using those values.

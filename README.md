@@ -25,18 +25,18 @@ pip install -e .
 ## Quick Start
 
 ```python
-from rmp_api import search_schools, search_professors, get_professor_summary, get_all_ratings, compute_score
+from rmp_api import search_schools, search_professors, get_professor_summary, get_all_ratings, compute_score, WEIGHT_PRESETS
 
 # Find a school
 schools = search_schools("UC Berkeley")
-school_id = schools[0]["node"]["id"]
+school_id = schools[0].id
 
 # Get aggregate stats
 summary = get_professor_summary("John DeNero", school_id)
 print(summary.avg_rating, summary.link)
 
 # Fetch all individual ratings
-professor_id = search_professors("John DeNero", school_id)[0]["node"]["id"]
+professor_id = search_professors("John DeNero", school_id)[0].id
 ratings = get_all_ratings(professor_id)
 
 # Compute quality signals
@@ -50,5 +50,5 @@ print(score.composite_score, score.top_tags)
 
 - No auth required — uses the public GraphQL endpoint.
 - Ratings are returned **newest first**.
-- `professor_id` (base64 node ID) is required for fetching ratings — get it from `search_professors`.
-- RMP may rate-limit heavy pagination. Add `time.sleep(0.5)` between pages if needed.
+- `search_schools` and `search_professors` return typed dataclasses. Use `.id` for API calls, `.legacy_id` only for building profile URLs.
+- RMP may rate-limit heavy pagination. Add `time.sleep(0.5)` between requests if needed.

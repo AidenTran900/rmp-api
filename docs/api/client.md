@@ -6,14 +6,22 @@ All functions communicate with the RateMyProfessors GraphQL API over HTTPS. No a
 
 ---
 
-## ID formats
+## Search result types
 
-Two ID formats appear throughout this module:
+`search_schools` returns `list[SchoolResult]` and `search_professors` returns `list[ProfessorResult]`. Both are typed dataclasses -- use attribute access, not dict indexing.
 
-- **`node["id"]`** -- Base64-encoded string (e.g. `"U2Nob29sLTEyMw=="`). Pass this as `school_id` or `professor_id` to all functions below.
-- **`node["legacyId"]`** -- Plain integer (e.g. `1234`). Only useful for building profile URLs like `https://www.ratemyprofessors.com/professor/1234`.
+```python
+school = search_schools("UC Berkeley")[0]
+school.id           # base64 node ID -- pass this to other functions
+school.legacy_id    # integer -- only useful for building profile URLs
+school.name         # "University of California, Berkeley"
 
-Using `legacyId` where `id` is expected won't raise an error -- you'll just get empty results.
+professor = search_professors("John DeNero", school.id)[0]
+professor.id        # base64 node ID -- pass this to get_all_ratings, etc.
+professor.legacy_id # integer -- only useful for building profile URLs
+```
+
+See [Models](models.md) for the full field list on each type.
 
 ---
 
