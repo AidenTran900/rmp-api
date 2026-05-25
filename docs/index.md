@@ -1,4 +1,4 @@
-# rmp-api
+# Rate My Professor API
 
 A Python library for querying the RateMyProfessors GraphQL API. Search for professors, pull their ratings, and compute quality signals from the data.
 
@@ -8,7 +8,7 @@ A Python library for querying the RateMyProfessors GraphQL API. Search for profe
 ## Install
 
 ```bash
-pip install git+https://github.com/youruser/rate-my-prof-api.git
+pip install git+https://github.com/AidenTran900/rmp-api.git
 ```
 
 Requires Python 3.10+.

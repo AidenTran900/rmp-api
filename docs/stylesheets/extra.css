@@ -1,0 +1,305 @@
+/* ============================================================
+   rmp-api docs — custom theme
+   Palette: Ink Black / Glaucous / Powder Blue / Pale Sky / Alabaster Grey
+   Fonts:   Montserrat (headings) + Karla (body)
+   Animations: micro-interactions only, ≤400ms, GPU-composited
+   ============================================================ */
+
+/* ── Google Fonts: Montserrat for headings ───────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap');
+
+/* ── Brand tokens ────────────────────────────────────────── */
+:root {
+  --rmp-ink:      #04080f;   /* Ink Black          */
+  --rmp-ink-2:    #1b2b43;   /* dark navy (70% ink + 30% glaucous) */
+  --rmp-blue:     #507dbc;   /* Glaucous           */
+  --rmp-blue-dk:  #3a5d8a;   /* Glaucous −20L      */
+  --rmp-powder:   #a1c6ea;   /* Powder Blue */
+  --rmp-pale:     #bbd1ea;   /* Pale Sky    */
+  --rmp-alabaster:#dae3e5;   /* Alabaster Grey */
+  --rmp-glow:     rgba(80, 125, 188, 0.20);
+  --rmp-glow-sm:  rgba(80, 125, 188, 0.10);
+
+  --rmp-ease:     cubic-bezier(0.4, 0, 0.2, 1);
+  --rmp-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --rmp-ease-in:  cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ── Color overrides: light ──────────────────────────────── */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color:             var(--rmp-blue);
+  --md-primary-fg-color--light:      var(--rmp-powder);
+  --md-primary-fg-color--dark:       var(--rmp-blue-dk);
+  --md-accent-fg-color:              var(--rmp-blue);
+  --md-accent-fg-color--transparent: rgba(80, 125, 188, 0.10);
+  --md-default-bg-color:             #f6f9fb;
+  --md-default-fg-color:             var(--rmp-ink);
+  --md-default-fg-color--light:      rgba(4, 8, 15, 0.54);
+  --md-default-fg-color--lighter:    rgba(4, 8, 15, 0.32);
+  --md-default-fg-color--lightest:   rgba(4, 8, 15, 0.12);
+  --md-code-bg-color:                var(--rmp-alabaster);
+  --md-footer-bg-color:              var(--rmp-ink);
+  --md-footer-bg-color--dark:        #020508;
+}
+
+/* ── Color overrides: dark ───────────────────────────────── */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color:             var(--rmp-powder);
+  --md-primary-fg-color--light:      var(--rmp-pale);
+  --md-primary-fg-color--dark:       var(--rmp-blue);
+  --md-accent-fg-color:              var(--rmp-powder);
+  --md-accent-fg-color--transparent: rgba(161, 198, 234, 0.12);
+  --md-default-bg-color:             var(--rmp-ink);
+  --md-code-bg-color:                #0d1520;
+}
+
+/* ── Typography: Montserrat headings ─────────────────────── */
+.md-typeset h1,
+.md-typeset h2 {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.md-typeset h1 {
+  color: var(--rmp-blue);
+  font-size: 2.1rem;
+}
+
+.md-typeset h2 {
+  font-size: 1.5rem;
+}
+
+.md-typeset h3,
+.md-typeset h4 {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-weight: 600;
+}
+
+/* ── Page load fade-in ───────────────────────────────────── */
+.md-content__inner {
+  animation: rmp-fadein 300ms var(--rmp-ease-out) both;
+}
+
+@keyframes rmp-fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Sidebar nav items: staggered slide-in ───────────────── */
+.md-sidebar--primary .md-nav__item {
+  animation: rmp-slide 260ms var(--rmp-ease-out) both;
+}
+
+@keyframes rmp-slide {
+  from { opacity: 0; transform: translateX(-5px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.md-sidebar--primary .md-nav__item:nth-child(1) { animation-delay:   0ms; }
+.md-sidebar--primary .md-nav__item:nth-child(2) { animation-delay:  30ms; }
+.md-sidebar--primary .md-nav__item:nth-child(3) { animation-delay:  60ms; }
+.md-sidebar--primary .md-nav__item:nth-child(4) { animation-delay:  90ms; }
+.md-sidebar--primary .md-nav__item:nth-child(5) { animation-delay: 120ms; }
+.md-sidebar--primary .md-nav__item:nth-child(6) { animation-delay: 150ms; }
+.md-sidebar--primary .md-nav__item:nth-child(7) { animation-delay: 180ms; }
+.md-sidebar--primary .md-nav__item:nth-child(8) { animation-delay: 210ms; }
+
+/* ── Nav links: color transition only ───────────────────── */
+.md-nav__link {
+  transition: color 200ms var(--rmp-ease);
+}
+
+/* ── TOC (secondary nav): active indent + color ──────────── */
+.md-nav--secondary .md-nav__link {
+  transition: color 180ms var(--rmp-ease),
+              padding-left 200ms var(--rmp-ease);
+  border-left: 2px solid transparent;
+  padding-left: 0.5rem;
+}
+
+.md-nav--secondary .md-nav__link:hover {
+  color: var(--rmp-blue);
+}
+
+.md-nav--secondary .md-nav__link--active {
+  border-left-color: var(--rmp-blue);
+  color: var(--rmp-blue);
+  padding-left: 0.85rem;
+}
+
+/* ── Header: smooth shadow on scroll ─────────────────────── */
+.md-header {
+  transition: box-shadow 250ms var(--rmp-ease),
+              background-color 250ms var(--rmp-ease);
+  will-change: box-shadow;
+}
+
+.md-header[data-md-state="shadow"] {
+  box-shadow: 0 2px 12px rgba(4, 8, 15, 0.15);
+}
+
+[data-md-color-scheme="slate"] .md-header,
+[data-md-color-scheme="slate"] .md-tabs {
+  background-color: var(--rmp-ink-2);
+}
+
+/* ── Tab navigation ──────────────────────────────────────── */
+.md-tabs__link {
+  transition: opacity 200ms var(--rmp-ease),
+              color 200ms var(--rmp-ease);
+}
+
+/* ── Search: focus ring ──────────────────────────────────── */
+.md-search__input {
+  transition: box-shadow 220ms var(--rmp-ease),
+              background-color 220ms var(--rmp-ease);
+}
+
+.md-search__input:focus {
+  box-shadow: 0 0 0 3px var(--rmp-glow);
+}
+
+/* ── Code blocks: hover lift ─────────────────────────────── */
+.md-typeset .highlight,
+.md-typeset pre {
+  transition: box-shadow 240ms var(--rmp-ease),
+              transform 240ms var(--rmp-ease);
+  border-radius: 6px;
+  will-change: box-shadow, transform;
+}
+
+.md-typeset .highlight:hover,
+.md-typeset pre:hover {
+  box-shadow: 0 4px 20px var(--rmp-glow-sm),
+              0 1px 6px rgba(4, 8, 15, 0.06);
+  transform: translateY(-1px);
+}
+
+/* ── Inline code: subtle tint on hover ───────────────────── */
+.md-typeset :not(pre) > code {
+  transition: background-color 180ms var(--rmp-ease),
+              color 180ms var(--rmp-ease);
+}
+
+.md-typeset :not(pre) > code:hover {
+  background-color: rgba(80, 125, 188, 0.10);
+  color: var(--rmp-blue-dk);
+}
+
+/* ── Content links: animated underline ───────────────────── */
+.md-content a:not([class]),
+.md-typeset a:not([class]) {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: color 200ms var(--rmp-ease),
+              text-decoration-color 200ms var(--rmp-ease);
+}
+
+.md-content a:not([class]):hover,
+.md-typeset a:not([class]):hover {
+  color: var(--rmp-blue);
+  text-decoration-color: var(--rmp-powder);
+}
+
+/* ── Buttons: lift + shadow ──────────────────────────────── */
+.md-button {
+  transition: background-color 200ms var(--rmp-ease),
+              border-color     200ms var(--rmp-ease),
+              box-shadow       200ms var(--rmp-ease),
+              transform        180ms var(--rmp-ease);
+  will-change: transform, box-shadow;
+}
+
+.md-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px var(--rmp-glow);
+}
+
+.md-button:active {
+  transform: translateY(0);
+  transition-duration: 80ms;
+}
+
+.md-button--primary {
+  background-color: var(--rmp-blue);
+  border-color: var(--rmp-blue);
+  color: #fff;
+}
+
+.md-button--primary:hover {
+  background-color: var(--rmp-blue-dk);
+  border-color: var(--rmp-blue-dk);
+  color: #fff;
+}
+
+/* ── Admonitions: hover nudge ────────────────────────────── */
+.md-typeset .admonition,
+.md-typeset details {
+  transition: box-shadow 230ms var(--rmp-ease),
+              transform   230ms var(--rmp-ease);
+  border-radius: 6px;
+  will-change: transform;
+}
+
+.md-typeset .admonition:hover,
+.md-typeset details:hover {
+  box-shadow: 0 4px 18px rgba(4, 8, 15, 0.09);
+  transform: translateX(3px);
+}
+
+/* ── Tables: row hover highlight ─────────────────────────── */
+.md-typeset table:not([class]) tbody tr {
+  transition: background-color 150ms var(--rmp-ease);
+}
+
+.md-typeset table:not([class]) tbody tr:hover {
+  background-color: rgba(80, 125, 188, 0.06) !important;
+}
+
+/* ── Back-to-top button ──────────────────────────────────── */
+.md-top {
+  transition: opacity 300ms var(--rmp-ease),
+              transform 300ms var(--rmp-ease),
+              background-color 200ms var(--rmp-ease);
+  will-change: opacity, transform;
+}
+
+.md-top:hover {
+  background-color: var(--rmp-blue-dk);
+}
+
+/* ── Footer nav links ────────────────────────────────────── */
+.md-footer-nav__link {
+  transition: opacity 200ms var(--rmp-ease),
+              transform 200ms var(--rmp-ease);
+}
+
+.md-footer-nav__link:hover {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+.md-footer-nav__link--prev:hover {
+  transform: translateX(-3px);
+}
+
+/* ── mkdocstrings: anchor target highlight ───────────────── */
+[id].doc-object:target {
+  background-color: rgba(80, 125, 188, 0.06);
+  border-radius: 4px;
+  transition: background-color 200ms var(--rmp-ease);
+}
+
+/* ── Reduced-motion: respect OS preference ───────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

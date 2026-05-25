@@ -1,16 +1,55 @@
 site_name: rmp-api
 site_description: Python wrapper for the RateMyProfessors GraphQL API
+repo_url: https://github.com/AidenTran900/rmp-api
+repo_name: AidenTran900/rmp-api
 
 theme:
   name: material
+
+  # ── Palette (light + dark toggle) ────────────────────────
+  palette:
+    - scheme: default
+      primary: custom       # overridden to #FF5B3E in extra.css
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+
+  # ── Typography ────────────────────────────────────────────
+  font:
+    text: Karla             # body — loaded via Google Fonts
+    code: JetBrains Mono    # code blocks
+
+  # ── Icons & logo ─────────────────────────────────────────
+  icon:
+    logo: material/school
+    repo: fontawesome/brands/github
+
+  # ── Features ─────────────────────────────────────────────
   features:
-    - navigation.instant
-    - navigation.top
+    - navigation.instant        # SPA-style navigation
+    - navigation.instant.progress
+    - navigation.top            # back-to-top button
+    - navigation.tracking       # URL fragment tracking
+    - navigation.sections       # expand nav sections
     - search.suggest
     - search.highlight
+    - content.code.copy         # copy button on code blocks
+    - content.code.annotate
+
+extra_css:
+  - stylesheets/extra.css
 
 plugins:
   - search
+  - autorefs
   - mkdocstrings:
       handlers:
         python:

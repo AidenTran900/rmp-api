@@ -40,7 +40,7 @@ Custom weights only affect `composite_score`. All other signals (`raw_avg_rating
 
 ## Sorting and comparison
 
-When using `compare_professors`, pass a `SortBy` enum value or its string equivalent to choose the ranking field. Higher values always rank first -- to rank by easiness, use `SortBy.EASINESS_SCORE` rather than `SortBy.AVG_DIFFICULTY`.
+When using [`compare_professors`][rmp_api.scoring.score.compare_professors], pass a [`SortBy`][rmp_api.models.SortBy] enum value or its string equivalent to choose the ranking field. Higher values always rank first -- to rank by easiness, use `SortBy.EASINESS_SCORE` rather than `SortBy.AVG_DIFFICULTY`.
 
 ```python
 from rmp_api import SortBy, compare_professors

@@ -3,13 +3,13 @@
 ## Installation
 
 ```bash
-pip install git+https://github.com/youruser/rate-my-prof-api.git
+pip install git+https://github.com/AidenTran900/rmp-api.git
 ```
 
 Or clone and install locally for development:
 
 ```bash
-git clone https://github.com/youruser/rate-my-prof-api.git
+git clone https://github.com/AidenTran900/rmp-api.git
 cd rate-my-prof-api
 pip install -e .
 ```
@@ -34,7 +34,7 @@ print(school.name)  # "University of California, Berkeley"
 school_id = school.id  # "U2Nob29sLTEyMw=="
 ```
 
-`search_schools` returns a list of `SchoolResult` objects ranked by relevance. Use `school.id` for professor searches. `school.legacy_id` is only needed if you want to build a profile URL.
+[`search_schools`][rmp_api.client.search_schools] returns a list of [`SchoolResult`][rmp_api.models.SchoolResult] objects ranked by relevance. Use `school.id` for professor searches. `school.legacy_id` is only needed if you want to build a profile URL.
 
 ### 2. Find the professor
 
@@ -48,7 +48,7 @@ print(professor.first_name, professor.last_name)  # John DeNero
 professor_id = professor.id  # "VGVhY2hlci0xMjM0NTY="
 ```
 
-`search_professors` returns a list of `ProfessorResult` objects. Use `professor.id` for the next step.
+[`search_professors`][rmp_api.client.search_professors] returns a list of [`ProfessorResult`][rmp_api.models.ProfessorResult] objects. Use `professor.id` for the next step.
 
 ### 3. Fetch their ratings
 
@@ -59,7 +59,7 @@ ratings = get_all_ratings(professor_id)
 print(len(ratings))  # varies by professor
 ```
 
-`get_all_ratings` handles pagination automatically. You always get the full set of ratings in one call.
+[`get_all_ratings`][rmp_api.client.get_all_ratings] handles pagination automatically. You always get the full set of [`Rating`][rmp_api.models.Rating] objects in one call.
 
 ### 4. Compute a quality score
 
@@ -80,7 +80,7 @@ That's the full flow. Four calls.
 
 ## Quick stats without fetching all ratings
 
-If you only need the aggregated numbers from RMP's own profile page (average rating, difficulty, would-take-again), use `get_professor_summary`. It's a single request and skips pagination entirely.
+If you only need the aggregated numbers from RMP's own profile page (average rating, difficulty, would-take-again), use [`get_professor_summary`][rmp_api.client.get_professor_summary]. It's a single request and skips pagination entirely.
 
 ```python
 from rmp_api import search_schools, get_professor_summary
@@ -97,13 +97,13 @@ print(summary.num_ratings)               # 215
 print(summary.link)                      # https://www.ratemyprofessors.com/professor/...
 ```
 
-Use `get_professor_summary` when you just need a quick overview. Use `get_all_ratings` + `compute_score` when you need detailed signals, filtering, comparisons, or trend analysis.
+Use [`get_professor_summary`][rmp_api.client.get_professor_summary] when you just need a quick overview. Use [`get_all_ratings`][rmp_api.client.get_all_ratings] + [`compute_score`][rmp_api.scoring.score.compute_score] when you need detailed signals, filtering, comparisons, or trend analysis.
 
 ---
 
 ## Common mistakes
 
-**Not checking if the search returned anything.** Both `search_schools` and `search_professors` return `None` on network failure and an empty list when nothing matches. Check before indexing.
+**Not checking if the search returned anything.** Both [`search_schools`][rmp_api.client.search_schools] and [`search_professors`][rmp_api.client.search_professors] return `None` on network failure and an empty list when nothing matches. Check before indexing.
 
 ```python
 results = search_professors("Some Prof", school_id)
@@ -113,7 +113,7 @@ else:
     professor_id = results[0].id
 ```
 
-**Trusting `-1` as a valid rating.** `get_professor_summary` returns `-1` for numeric fields when no professor is found. Always check `summary.num_ratings > 0` before using those values.
+**Trusting `-1` as a valid rating.** [`get_professor_summary`][rmp_api.client.get_professor_summary] returns `-1` for numeric fields when no professor is found. Always check `summary.num_ratings > 0` before using those values.
 
 ```python
 summary = get_professor_summary("Nonexistent Prof", school_id)
@@ -121,7 +121,7 @@ if summary.num_ratings == 0:
     print("Professor not found")
 ```
 
-**Expecting `would_take_again_percent` and `would_take_again_pct` to match.** They're from different sources. `get_professor_summary` returns RMP's own aggregated `would_take_again_percent` (0-100). `compute_score` returns `would_take_again_pct` computed from individual ratings (0-1). They should be close but won't be identical.
+**Expecting `would_take_again_percent` and `would_take_again_pct` to match.** They're from different sources. [`get_professor_summary`][rmp_api.client.get_professor_summary] returns RMP's own aggregated `would_take_again_percent` (0-100). [`compute_score`][rmp_api.scoring.score.compute_score] returns `would_take_again_pct` computed from individual ratings (0-1). They should be close but won't be identical.
 
 **Hammering the API in a loop.** The library caches results per process, but the first call for each professor still hits the network. If you're fetching ratings for many professors, add a small sleep between calls to avoid getting rate-limited.
 
