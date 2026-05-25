@@ -194,7 +194,7 @@ from rmp_api import compute_score, WEIGHT_PRESETS
 # Built-in presets
 score = compute_score(ratings, weights=WEIGHT_PRESETS["best_teacher"])
 score = compute_score(ratings, weights=WEIGHT_PRESETS["easiest"])
-score = compute_score(ratings, weights=WEIGHT_PRESETS["most_reliable"])
+score = compute_score(ratings, weights=WEIGHT_PRESETS["rigorous"])
 score = compute_score(ratings, weights=WEIGHT_PRESETS["overall"])
 
 # Custom weights -- values should sum to ~1.0
