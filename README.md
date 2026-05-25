@@ -17,6 +17,12 @@ No API key required. No scraping. Requires Python 3.10+.
 
 ---
 
+## Documentation
+
+Full docs at **[docs.aidentran.dev/rmp-api/](https://docs.aidentran.dev/rmp-api/)** (Getting Started, API Reference, Examples, Troubleshooting).
+
+---
+
 ## Installation
 
 ```bash
@@ -36,12 +42,6 @@ git clone https://github.com/AidenTran900/rmp-api.git
 cd rate-my-prof-api
 pip install -e .
 ```
-
----
-
-## Documentation
-
-Full docs at **[docs.aidentran.dev/rmp-api/](https://docs.aidentran.dev/rmp-api/)** (Getting Started, API Reference, Examples, Troubleshooting).
 
 ---
 
