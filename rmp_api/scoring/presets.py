@@ -1,9 +1,4 @@
-"""
-presets.py
-
-Named weight configurations for compute_score.
-Pass a preset to the `weights` argument, or build a custom dict with the same keys.
-"""
+"""Named weight configurations for `compute_score`. Pass a preset to `weights=`, or build a custom dict with the same keys."""
 
 WEIGHT_PRESETS: dict[str, dict[str, float]] = {
     # Balanced default

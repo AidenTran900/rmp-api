@@ -1,6 +1,4 @@
-"""
-rmp_api.scoring — professor quality signals and composite scoring.
-"""
+"""Professor quality signals and composite scoring."""
 
 from .presets import WEIGHT_PRESETS
 from .score import (

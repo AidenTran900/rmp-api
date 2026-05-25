@@ -1,8 +1,4 @@
-"""
-rmp_api
-
-Python wrapper for the RateMyProfessors GraphQL API.
-"""
+"""Python wrapper for the RateMyProfessors GraphQL API."""
 
 from .client import (
     filter_ratings_by_keywords,
