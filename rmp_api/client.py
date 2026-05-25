@@ -66,13 +66,13 @@ def _graphql(query: str, variables: dict) -> dict:
 
 def _parse_rating(edge: dict) -> Rating:
     """
-    Map a single GraphQL rating edge to a :class:`~models.Rating`.
+    Map a single GraphQL rating edge to a [`Rating`][rmp_api.models.Rating].
 
     Args:
         edge: A ``ratings.edges`` item from the GraphQL response.
 
     Returns:
-        Populated :class:`~models.Rating` instance.
+        Populated [`Rating`][rmp_api.models.Rating] instance.
     """
     n = edge["node"]
     return Rating(
@@ -112,7 +112,7 @@ def search_schools(school_name: str) -> list[SchoolResult] | None:
         school_name: Full or partial school name to search.
 
     Returns:
-        List of :class:`~models.SchoolResult` objects ranked by relevance.
+        List of [`SchoolResult`][rmp_api.models.SchoolResult] objects ranked by relevance.
         ``None`` on request or parsing failure.
     """
     try:
@@ -146,10 +146,10 @@ def search_professors(
     Args:
         professor_name: Full or partial professor name to search.
         school_id: Base64-encoded RMP school node ID (e.g. ``"U2Nob29sLTEyMw=="``)
-            from :func:`search_schools`.
+            from [`search_schools`][rmp_api.client.search_schools].
 
     Returns:
-        List of :class:`~models.ProfessorResult` objects ranked by relevance.
+        List of [`ProfessorResult`][rmp_api.models.ProfessorResult] objects ranked by relevance.
         ``None`` on request or parsing failure.
     """
     try:
@@ -194,7 +194,7 @@ def get_professor_summary(
     """
     Fetch aggregate summary for the top search result matching a professor.
 
-    Wraps :func:`search_professors` and extracts the first result's stats.
+    Wraps [`search_professors`][rmp_api.client.search_professors] and extracts the first result's stats.
     When no match is found, returns a sentinel ``ProfessorRating`` with all
     numeric fields set to ``-1`` and ``num_ratings`` set to ``0``.
 
@@ -250,7 +250,7 @@ def get_ratings_page(
 
     Returns:
         3-tuple ``(ratings, has_next_page, end_cursor)`` where:
-        ``ratings`` is a list of :class:`~models.Rating` objects,
+        ``ratings`` is a list of [`Rating`][rmp_api.models.Rating] objects,
         ``has_next_page`` signals more pages exist,
         and ``end_cursor`` is passed as ``cursor`` in the next call (``None`` on last page).
         Returns ``([], False, None)`` on failure.
@@ -283,7 +283,7 @@ def _fetch_all_ratings_cached(
     """
     Cached inner fetch for a single course (or all courses when ``None``).
 
-    Not part of the public API — call :func:`get_all_ratings` instead.
+    Not part of the public API — call [`get_all_ratings`][rmp_api.client.get_all_ratings] instead.
     """
     all_ratings = []
     cursor = None
@@ -312,8 +312,8 @@ def get_all_ratings(
     Fetch all ratings for a professor, auto-paginating until exhausted.
 
     Results are cached per ``(professor_id, course_filter, page_size)`` for
-    the lifetime of the process. Call :func:`get_all_ratings.cache_clear` (via
-    ``_fetch_all_ratings_cached.cache_clear()``) to invalidate manually.
+    the lifetime of the process. Call ``_fetch_all_ratings_cached.cache_clear()``
+    to invalidate manually.
 
     Args:
         professor_id: Base64-encoded RMP professor node ID.
@@ -325,7 +325,7 @@ def get_all_ratings(
         page_size: Ratings fetched per page (default ``20``).
 
     Returns:
-        Combined list of :class:`~models.Rating` objects across all pages.
+        Combined list of [`Rating`][rmp_api.models.Rating] objects across all pages.
         Empty list if the first page fails.
     """
     if isinstance(course_filter, list):
@@ -369,7 +369,7 @@ def filter_ratings_by_keywords(
     Filter ratings whose comment contains one or more keywords.
 
     Args:
-        ratings: List of :class:`~models.Rating` objects to filter.
+        ratings: List of [`Rating`][rmp_api.models.Rating] objects to filter.
         keywords: Keyword string or list of keyword strings to search for.
             Each keyword is matched as a substring of the comment.
         match_all: When ``True``, a rating must contain **all** keywords
@@ -379,7 +379,7 @@ def filter_ratings_by_keywords(
             Default ``False`` (case-insensitive).
 
     Returns:
-        List of :class:`~models.Rating` objects whose ``comment`` field
+        List of [`Rating`][rmp_api.models.Rating] objects whose ``comment`` field
         satisfies the keyword filter. Preserves original order.
         Ratings with an empty or ``None`` comment are always excluded.
     """
@@ -420,10 +420,10 @@ def get_representative_ratings(
         professor_id: Base64-encoded RMP professor node ID.
         n: Number of representative ratings to return (default ``12``).
         course_filter: Optional course code(s) to restrict ratings. Accepts a
-            single string or list of strings (e.g. ``["CS61A", "CS61B"``).
+            single string or list of strings (e.g. ``["CS61A", "CS61B"]``).
 
     Returns:
-        List of up to ``n`` :class:`~models.Rating` objects.
+        List of up to ``n`` [`Rating`][rmp_api.models.Rating] objects.
     """
     all_ratings = get_all_ratings(professor_id, course_filter=course_filter)
     if len(all_ratings) <= n:

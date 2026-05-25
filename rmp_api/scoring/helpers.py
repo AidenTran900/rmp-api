@@ -11,13 +11,13 @@ def _parse_date(date_str: str) -> datetime | None:
     Parse an RMP timestamp string into an aware datetime.
 
     Handles the RMP format ``"2026-05-03 20:28:30 +0000 UTC"`` and falls
-    back to :func:`datetime.fromisoformat` for other ISO variants.
+    back to ``datetime.fromisoformat`` for other ISO variants.
 
     Args:
-        date_str: Raw date string from a :class:`~models.Rating`.
+        date_str: Raw date string from a [`Rating`][rmp_api.models.Rating].
 
     Returns:
-        Timezone-aware :class:`datetime`, or ``None`` if unparseable.
+        Timezone-aware ``datetime``, or ``None`` if unparseable.
     """
     if not date_str:
         return None
@@ -39,7 +39,7 @@ def _recency_weight(date_str: str, half_life_days: float = 365.0) -> float:
     Unparseable dates default to ``0.5``.
 
     Args:
-        date_str: Raw date string from a :class:`~models.Rating`.
+        date_str: Raw date string from a [`Rating`][rmp_api.models.Rating].
         half_life_days: Age (in days) at which weight halves.
 
     Returns:

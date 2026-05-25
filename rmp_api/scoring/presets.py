@@ -30,3 +30,15 @@ WEIGHT_PRESETS: dict[str, dict[str, float]] = {
         "reliability":      0.20,
     },
 }
+"""Named weight configurations for [`compute_score`][rmp_api.scoring.score.compute_score].
+
+Each value is a dict of component weights (``recency_rating``, ``would_take_again``,
+``easiness``, ``reliability``). Pass an entry to the ``weights`` parameter, or build a
+custom dict with the same keys.
+
+Presets:
+    overall:      Balanced default.
+    easiest:      Prioritises low difficulty (high easiness weight).
+    best_teacher: Prioritises teaching quality; ignores difficulty.
+    rigorous:     Rewards harder courses (negative easiness weight).
+"""

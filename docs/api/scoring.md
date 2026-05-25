@@ -63,6 +63,12 @@ comparison = compare_professors(professors, sort_by=SortBy.WOULD_TAKE_AGAIN_PCT)
 
 ---
 
+::: rmp_api.scoring.presets
+    options:
+      show_source: false
+
+---
+
 ::: rmp_api.scoring.signals
     options:
       show_source: false

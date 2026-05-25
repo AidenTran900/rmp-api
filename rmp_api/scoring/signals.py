@@ -18,7 +18,7 @@ def compute_recency_weighted_rating(
     More recent ratings contribute more to the result. Output stays on the 1–5 scale.
 
     Args:
-        ratings: List of :class:`~models.Rating` objects.
+        ratings: List of [`Rating`][rmp_api.models.Rating] objects.
         half_life_days: Exponential decay half-life in days.
 
     Returns:
@@ -58,7 +58,7 @@ def compute_easiness_score(ratings: list[Rating]) -> float:
     Ratings with ``None`` difficulty are excluded from both sides.
 
     Args:
-        ratings: List of :class:`~models.Rating` objects.
+        ratings: List of [`Rating`][rmp_api.models.Rating] objects.
 
     Returns:
         Easiness in ``[0, 1]``, or ``0.0`` if no difficulty data.
@@ -77,7 +77,7 @@ def compute_tag_frequencies(ratings: list[Rating]) -> list[tuple[str, int]]:
     list-typed tags are used directly.
 
     Args:
-        ratings: List of :class:`~models.Rating` objects.
+        ratings: List of [`Rating`][rmp_api.models.Rating] objects.
 
     Returns:
         List of ``(tag, count)`` tuples sorted descending by frequency.
@@ -98,7 +98,7 @@ def compute_difficulty_histogram(ratings: list[Rating]) -> dict[int, int]:
     Count ratings in each integer difficulty bucket from 1 to 5.
 
     Args:
-        ratings: List of :class:`~models.Rating` objects.
+        ratings: List of [`Rating`][rmp_api.models.Rating] objects.
 
     Returns:
         Dict mapping each bucket ``{1, 2, 3, 4, 5}`` to its count.
@@ -117,7 +117,7 @@ def compute_review_velocity(ratings: list[Rating], window_years: float = 2.0) ->
     Average number of reviews posted per year within a rolling window.
 
     Args:
-        ratings: List of :class:`~models.Rating` objects.
+        ratings: List of [`Rating`][rmp_api.models.Rating] objects.
         window_years: How many years back to look (default ``2.0``).
 
     Returns:

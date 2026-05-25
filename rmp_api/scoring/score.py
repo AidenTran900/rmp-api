@@ -25,9 +25,9 @@ def compute_score(
     then combines them into a single ``composite_score`` in ``[0, 1]``.
 
     Args:
-        ratings: Output of :func:`~client.get_all_ratings` or
-            :func:`~client.get_ratings_page`.
-        weights: Score component weights. Use a :data:`WEIGHT_PRESETS` entry
+        ratings: Output of [`get_all_ratings`][rmp_api.client.get_all_ratings] or
+            [`get_ratings_page`][rmp_api.client.get_ratings_page].
+        weights: Score component weights. Use a [`WEIGHT_PRESETS`][rmp_api.scoring.presets.WEIGHT_PRESETS] entry
             or supply a custom dict with keys
             ``recency_rating``, ``would_take_again``, ``easiness``, ``reliability``.
             Values should sum to ~1.0; composite is clamped to ``[0, 1]``.
@@ -36,7 +36,7 @@ def compute_score(
             rating contributes half the weight of a brand-new one.
 
     Returns:
-        :class:`ProfessorScore` with all signals populated. Returns a
+        [`ProfessorScore`][rmp_api.models.ProfessorScore] with all signals populated. Returns a
         zero-valued instance if ``ratings`` is empty.
     """
     if weights is None:
@@ -114,30 +114,30 @@ def compute_score_over_time(
     half_life_days: float = 365.0,
 ) -> ScoreTimeline:
     """
-    Bucket ratings by time period and compute a :class:`ProfessorScore` per bucket.
+    Bucket ratings by time period and compute a [`ProfessorScore`][rmp_api.models.ProfessorScore] per bucket.
 
     Useful for detecting whether a professor has improved or declined over time.
     Buckets with zero dated ratings are skipped. Buckets are returned oldest -> newest.
 
     Args:
-        ratings: Output of :func:`~client.get_all_ratings` or similar.
-        period: Bucketing granularity. Use :class:`~models.TimePeriod` members
+        ratings: Output of [`get_all_ratings`][rmp_api.client.get_all_ratings] or similar.
+        period: Bucketing granularity. Use [`TimePeriod`][rmp_api.models.TimePeriod] members
             or the equivalent plain strings (``StrEnum`` — both work):
 
-            * :attr:`~models.TimePeriod.YEAR` / ``"year"``         — ``"2023"``.
-            * :attr:`~models.TimePeriod.SEMESTER` / ``"semester"`` — ``"2023-Spring"`` / ``"2023-Fall"``.
-            * :attr:`~models.TimePeriod.QUARTER` / ``"quarter"``   — ``"2023-Q1"`` … ``"2023-Q4"``.
+            * [`TimePeriod.YEAR`][rmp_api.models.TimePeriod] / ``"year"`` — ``"2023"``.
+            * [`TimePeriod.SEMESTER`][rmp_api.models.TimePeriod] / ``"semester"`` — ``"2023-Spring"`` / ``"2023-Fall"``.
+            * [`TimePeriod.QUARTER`][rmp_api.models.TimePeriod] / ``"quarter"`` — ``"2023-Q1"`` … ``"2023-Q4"``.
 
-        weights: Passed through to each :func:`compute_score` call.
-        half_life_days: Recency decay half-life passed to each :func:`compute_score` call.
+        weights: Passed through to each [`compute_score`][rmp_api.scoring.score.compute_score] call.
+        half_life_days: Recency decay half-life passed to each [`compute_score`][rmp_api.scoring.score.compute_score] call.
 
     Returns:
-        :class:`ScoreTimeline` with ``periods`` sorted oldest -> newest,
+        [`ScoreTimeline`][rmp_api.models.ScoreTimeline] with ``periods`` sorted oldest -> newest,
         a ``trend`` slope (positive = improving), and ``total_span_years``.
         Returns an empty timeline if no ratings have parseable dates.
 
     Raises:
-        ValueError: If ``period`` is not a valid :class:`~models.TimePeriod` value.
+        ValueError: If ``period`` is not a valid [`TimePeriod`][rmp_api.models.TimePeriod] value.
     """
     try:
         period = TimePeriod(period)
@@ -222,22 +222,22 @@ def compute_split_score(
     """
     Compute professor scores split by online vs. in-person delivery format.
 
-    Runs :func:`compute_score` three times — once per subset and once for all
-    ratings combined — so each :class:`ProfessorScore` reflects only the
+    Runs [`compute_score`][rmp_api.scoring.score.compute_score] three times — once per subset and once for all
+    ratings combined — so each [`ProfessorScore`][rmp_api.models.ProfessorScore] reflects only the
     ratings relevant to that format.
 
     Args:
-        ratings: Output of :func:`~client.get_all_ratings` or
-            :func:`~client.get_ratings_page`.
-        weights: Passed through to each :func:`compute_score` call. See its
+        ratings: Output of [`get_all_ratings`][rmp_api.client.get_all_ratings] or
+            [`get_ratings_page`][rmp_api.client.get_ratings_page].
+        weights: Passed through to each [`compute_score`][rmp_api.scoring.score.compute_score] call. See its
             docs for valid keys and defaults.
         half_life_days: Recency decay half-life passed to each
-            :func:`compute_score` call.
+            [`compute_score`][rmp_api.scoring.score.compute_score] call.
 
     Returns:
-        :class:`SplitScore` with ``online``, ``in_person``, and ``combined``
+        [`SplitScore`][rmp_api.models.SplitScore] with ``online``, ``in_person``, and ``combined``
         fields. Subsets with zero ratings return a zero-valued
-        :class:`ProfessorScore`.
+        [`ProfessorScore`][rmp_api.models.ProfessorScore].
     """
     online_ratings   = [r for r in ratings if r.is_for_online_class]
     in_person_ratings = [r for r in ratings if not r.is_for_online_class]
@@ -249,8 +249,8 @@ def compute_split_score(
     )
 
 
-#: Frozenset of valid ``sort_by`` string values — mirrors :class:`~models.SortBy` members.
-#: Kept for backward-compat introspection; prefer :class:`~models.SortBy` in new code.
+#: Frozenset of valid ``sort_by`` string values — mirrors [`SortBy`][rmp_api.models.SortBy] members.
+#: Kept for backward-compat introspection; prefer [`SortBy`][rmp_api.models.SortBy] in new code.
 SORTABLE_FIELDS: frozenset[str] = frozenset(m.value for m in SortBy)
 
 
@@ -263,7 +263,7 @@ def compare_professors(
     """
     Compute and rank scores for multiple professors side-by-side.
 
-    Each professor's full :class:`ProfessorScore` is computed from their
+    Each professor's full [`ProfessorScore`][rmp_api.models.ProfessorScore] is computed from their
     ratings, then professors are ranked best -> worst on a chosen signal.
 
     Args:
@@ -273,25 +273,25 @@ def compare_professors(
             * ``list[tuple[str, list[Rating]]]`` — ``[("Prof A", ratings_a), ...]``
               (preserves insertion order when labels duplicate).
 
-        sort_by: :class:`~models.ProfessorScore` field to rank by. Use
-            :class:`~models.SortBy` members or the equivalent plain strings
+        sort_by: [`ProfessorScore`][rmp_api.models.ProfessorScore] field to rank by. Use
+            [`SortBy`][rmp_api.models.SortBy] members or the equivalent plain strings
             (``StrEnum`` — both work). Higher is always ranked first — to rank
             by easiness (lower difficulty = better) use
-            :attr:`~models.SortBy.EASINESS_SCORE` instead of
-            :attr:`~models.SortBy.AVG_DIFFICULTY`.
-        weights: Weight dict passed to each :func:`compute_score` call.
-            Use a :data:`WEIGHT_PRESETS` entry or a custom dict.
+            [`SortBy.EASINESS_SCORE`][rmp_api.models.SortBy] instead of
+            [`SortBy.AVG_DIFFICULTY`][rmp_api.models.SortBy].
+        weights: Weight dict passed to each [`compute_score`][rmp_api.scoring.score.compute_score] call.
+            Use a [`WEIGHT_PRESETS`][rmp_api.scoring.presets.WEIGHT_PRESETS] entry or a custom dict.
             Only affects ``composite_score``; all other signals are
             weight-independent.
         half_life_days: Recency decay half-life in days passed to each
-            :func:`compute_score` call. Only affects recency-sensitive signals.
+            [`compute_score`][rmp_api.scoring.score.compute_score] call. Only affects recency-sensitive signals.
 
     Returns:
-        :class:`ProfessorComparison` with:
+        [`ProfessorComparison`][rmp_api.models.ProfessorComparison] with:
 
         * ``ranking`` — list of ``(label, ProfessorScore)`` sorted best -> worst.
         * ``scores`` — ``{label: ProfessorScore}`` for direct lookup.
-        * ``sort_by`` — the resolved :class:`~models.SortBy` value used for ranking.
+        * ``sort_by`` — the resolved [`SortBy`][rmp_api.models.SortBy] value used for ranking.
         * ``best`` / ``worst`` — labels of the top and bottom professors.
         * ``deltas`` — ``{label: float}`` difference from the best value
             on the ``sort_by`` field (best = ``0.0``, others ``<= 0.0``).
@@ -299,7 +299,7 @@ def compare_professors(
         Returns a comparison with empty ``ranking`` if ``professors`` is empty.
 
     Raises:
-        ValueError: If ``sort_by`` is not a valid :class:`~models.SortBy` value.
+        ValueError: If ``sort_by`` is not a valid [`SortBy`][rmp_api.models.SortBy] value.
     """
     try:
         sort_by = SortBy(sort_by)

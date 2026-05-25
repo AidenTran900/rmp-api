@@ -7,7 +7,7 @@ from enum import StrEnum
 @dataclass
 class SchoolResult:
     """
-    A school returned by :func:`~client.search_schools`.
+    A school returned by [`search_schools`][rmp_api.client.search_schools].
 
     Attributes:
         id: Base64-encoded RMP node ID. Pass this as ``school_id`` to other functions.
@@ -32,7 +32,7 @@ class SchoolResult:
 @dataclass
 class ProfessorResult:
     """
-    A professor returned by :func:`~client.search_professors`.
+    A professor returned by [`search_professors`][rmp_api.client.search_professors].
 
     Attributes:
         id: Base64-encoded RMP node ID. Pass this as ``professor_id`` to other functions.
@@ -63,7 +63,7 @@ class ProfessorResult:
 
 class TimePeriod(StrEnum):
     """
-    Time bucketing granularity for :func:`~scoring.compute_score_over_time`.
+    Time bucketing granularity for [`compute_score_over_time`][rmp_api.scoring.score.compute_score_over_time].
 
     Members compare equal to their string values, so plain strings still work:
     ``TimePeriod.YEAR == "year"`` is ``True``.
@@ -81,14 +81,15 @@ class TimePeriod(StrEnum):
 
 class SortBy(StrEnum):
     """
-    :class:`~models.ProfessorScore` field to rank by in
-    :func:`~scoring.compare_professors`.
+    [`ProfessorScore`][rmp_api.models.ProfessorScore] field to rank by in
+    [`compare_professors`][rmp_api.scoring.score.compare_professors].
 
     Members compare equal to their string values, so plain strings still work:
     ``SortBy.COMPOSITE_SCORE == "composite_score"`` is ``True``.
 
     Higher values are always ranked first. To rank by easiness (lower difficulty
-    = better), use :attr:`EASINESS_SCORE` rather than :attr:`AVG_DIFFICULTY`.
+    = better), use [`EASINESS_SCORE`][rmp_api.models.SortBy] rather
+    than [`AVG_DIFFICULTY`][rmp_api.models.SortBy].
 
     Members:
         COMPOSITE_SCORE:        Weighted composite (default).
@@ -195,9 +196,9 @@ class Rating:
 @dataclass
 class ProfessorScore:
     """
-    All quality signals computed from a professor's :class:`Rating` list.
+    All quality signals computed from a professor's [`Rating`][rmp_api.models.Rating] list.
 
-    Produced by :func:`~scoring.compute_score`. All scores are normalized
+    Produced by [`compute_score`][rmp_api.scoring.score.compute_score]. All scores are normalized
     unless noted otherwise.
 
     Attributes:
@@ -257,12 +258,12 @@ class ProfessorComparison:
     """
     Side-by-side comparison of multiple professors ranked by a chosen signal.
 
-    Produced by :func:`~scoring.compare_professors`.
+    Produced by [`compare_professors`][rmp_api.scoring.score.compare_professors].
 
     Attributes:
         ranking: List of ``(label, score)`` pairs sorted best -> worst by ``sort_by``.
         scores: ``{label: ProfessorScore}`` mapping for direct lookup.
-        sort_by: Name of the :class:`ProfessorScore` field used for ranking.
+        sort_by: Name of the [`ProfessorScore`][rmp_api.models.ProfessorScore] field used for ranking.
         best: Label of the top-ranked professor.
         worst: Label of the lowest-ranked professor.
         deltas: ``{label: float}`` showing each professor's ``sort_by`` value minus
@@ -283,8 +284,8 @@ class ScoreTimeline:
     """
     Professor scores bucketed over time with a linear trend.
 
-    Produced by :func:`~scoring.compute_score_over_time`. Buckets are sorted
-    oldest -> newest; each contains a full :class:`ProfessorScore` computed
+    Produced by [`compute_score_over_time`][rmp_api.scoring.score.compute_score_over_time]. Buckets are sorted
+    oldest -> newest; each contains a full [`ProfessorScore`][rmp_api.models.ProfessorScore] computed
     from only the ratings in that period.
 
     Attributes:
@@ -308,8 +309,8 @@ class SplitScore:
     """
     Professor scores split by delivery format.
 
-    Produced by :func:`~scoring.compute_split_score`. Each field is a full
-    :class:`ProfessorScore` computed from the relevant subset of ratings.
+    Produced by [`compute_split_score`][rmp_api.scoring.score.compute_split_score]. Each field is a full
+    [`ProfessorScore`][rmp_api.models.ProfessorScore] computed from the relevant subset of ratings.
 
     Attributes:
         online: Score from ratings where ``is_for_online_class`` is ``True``.
