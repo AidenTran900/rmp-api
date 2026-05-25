@@ -5,7 +5,7 @@ Main entry point for professor scoring. Orchestrates all signals into a
 single ProfessorScore with a composite score.
 """
 
-from ..models import ProfessorScore, Rating, ScoreTimeline, SplitScore
+from ..models import ProfessorComparison, ProfessorScore, Rating, ScoreTimeline, SplitScore
 from .helpers import _overall, _parse_date
 from .presets import WEIGHT_PRESETS
 from .signals import (
@@ -248,4 +248,120 @@ def compute_split_score(
         online=compute_score(online_ratings, weights, half_life_days),
         in_person=compute_score(in_person_ratings, weights, half_life_days),
         combined=compute_score(ratings, weights, half_life_days),
+    )
+
+
+#: Numeric :class:`~models.ProfessorScore` fields valid for use as ``sort_by``
+#: in :func:`compare_professors`.
+SORTABLE_FIELDS: frozenset[str] = frozenset({
+    "composite_score",
+    "raw_avg_rating",
+    "avg_clarity",
+    "avg_helpfulness",
+    "avg_difficulty",
+    "recency_weighted_rating",
+    "reliability_score",
+    "easiness_score",
+    "would_take_again_pct",
+    "review_velocity",
+    "num_ratings",
+})
+
+
+def compare_professors(
+    professors: dict[str, list[Rating]] | list[tuple[str, list[Rating]]],
+    sort_by: str = "composite_score",
+    weights: dict[str, float] | None = None,
+    half_life_days: float = 365.0,
+) -> ProfessorComparison:
+    """
+    Compute and rank scores for multiple professors side-by-side.
+
+    Each professor's full :class:`ProfessorScore` is computed from their
+    ratings, then professors are ranked best → worst on a chosen signal.
+
+    Args:
+        professors: Professors to compare, supplied as either:
+
+            * ``dict[str, list[Rating]]`` — ``{"Prof A": ratings_a, ...}``
+            * ``list[tuple[str, list[Rating]]]`` — ``[("Prof A", ratings_a), ...]``
+              (preserves insertion order when labels duplicate).
+
+        sort_by: :class:`ProfessorScore` field to rank by. Higher is always
+            considered better — to compare by difficulty (lower = easier),
+            use ``"easiness_score"`` instead of ``"avg_difficulty"``.
+            Valid values (see :data:`SORTABLE_FIELDS`):
+
+            ``"composite_score"`` *(default)*, ``"raw_avg_rating"``,
+            ``"avg_clarity"``, ``"avg_helpfulness"``, ``"avg_difficulty"``,
+            ``"recency_weighted_rating"``, ``"reliability_score"``,
+            ``"easiness_score"``, ``"would_take_again_pct"``,
+            ``"review_velocity"``, ``"num_ratings"``.
+
+        weights: Weight dict passed to each :func:`compute_score` call.
+            Use a :data:`WEIGHT_PRESETS` entry or a custom dict.
+            Only affects ``composite_score``; all other signals are
+            weight-independent.
+        half_life_days: Recency decay half-life in days passed to each
+            :func:`compute_score` call. Only affects recency-sensitive signals.
+
+    Returns:
+        :class:`ProfessorComparison` with:
+
+        * ``ranking`` — list of ``(label, ProfessorScore)`` sorted best → worst.
+        * ``scores`` — ``{label: ProfessorScore}`` for direct lookup.
+        * ``sort_by`` — the field used for ranking.
+        * ``best`` / ``worst`` — labels of the top and bottom professors.
+        * ``deltas`` — ``{label: float}`` difference from the best value
+          on the ``sort_by`` field (best = ``0.0``, others ``<= 0.0``).
+
+        Returns a comparison with empty ``ranking`` if ``professors`` is empty.
+
+    Raises:
+        ValueError: If ``sort_by`` is not in :data:`SORTABLE_FIELDS`.
+    """
+    if sort_by not in SORTABLE_FIELDS:
+        raise ValueError(
+            f"sort_by must be one of {sorted(SORTABLE_FIELDS)!r}, got {sort_by!r}"
+        )
+
+    # Normalise input to list of (label, ratings) pairs
+    if isinstance(professors, dict):
+        pairs: list[tuple[str, list[Rating]]] = list(professors.items())
+    else:
+        pairs = list(professors)
+
+    if not pairs:
+        return ProfessorComparison(
+            ranking=[], scores={}, sort_by=sort_by, best="", worst="", deltas={}
+        )
+
+    # Compute a score per professor
+    scored: list[tuple[str, ProfessorScore]] = [
+        (label, compute_score(ratings, weights, half_life_days))
+        for label, ratings in pairs
+    ]
+
+    # Sort best → worst on chosen field (descending)
+    ranking = sorted(
+        scored, key=lambda t: getattr(t[1], sort_by), reverse=True
+    )
+
+    scores_dict = {label: score for label, score in scored}
+    best_label  = ranking[0][0]
+    worst_label = ranking[-1][0]
+    best_val    = getattr(ranking[0][1], sort_by)
+
+    deltas = {
+        label: round(getattr(score, sort_by) - best_val, 6)
+        for label, score in scored
+    }
+
+    return ProfessorComparison(
+        ranking=ranking,
+        scores=scores_dict,
+        sort_by=sort_by,
+        best=best_label,
+        worst=worst_label,
+        deltas=deltas,
     )

@@ -143,6 +143,32 @@ class ProfessorScore:
 
 
 @dataclass
+class ProfessorComparison:
+    """
+    Side-by-side comparison of multiple professors ranked by a chosen signal.
+
+    Produced by :func:`~scoring.compare_professors`.
+
+    Attributes:
+        ranking: List of ``(label, score)`` pairs sorted best → worst by ``sort_by``.
+        scores: ``{label: ProfessorScore}`` mapping for direct lookup.
+        sort_by: Name of the :class:`ProfessorScore` field used for ranking.
+        best: Label of the top-ranked professor.
+        worst: Label of the lowest-ranked professor.
+        deltas: ``{label: float}`` showing each professor's ``sort_by`` value minus
+            the best professor's value. Best professor has ``delta = 0.0``;
+            all others are ``<= 0.0``.
+    """
+
+    ranking: list[tuple[str, "ProfessorScore"]]
+    scores: dict[str, "ProfessorScore"]
+    sort_by: str
+    best: str
+    worst: str
+    deltas: dict[str, float]
+
+
+@dataclass
 class ScoreTimeline:
     """
     Professor scores bucketed over time with a linear trend.
