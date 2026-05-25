@@ -264,7 +264,7 @@ def compare_professors(
     Compute and rank scores for multiple professors side-by-side.
 
     Each professor's full :class:`ProfessorScore` is computed from their
-    ratings, then professors are ranked best → worst on a chosen signal.
+    ratings, then professors are ranked best -> worst on a chosen signal.
 
     Args:
         professors: Professors to compare, supplied as either:
@@ -289,7 +289,7 @@ def compare_professors(
     Returns:
         :class:`ProfessorComparison` with:
 
-        * ``ranking`` — list of ``(label, ProfessorScore)`` sorted best → worst.
+        * ``ranking`` — list of ``(label, ProfessorScore)`` sorted best -> worst.
         * ``scores`` — ``{label: ProfessorScore}`` for direct lookup.
         * ``sort_by`` — the resolved :class:`~models.SortBy` value used for ranking.
         * ``best`` / ``worst`` — labels of the top and bottom professors.
@@ -325,7 +325,7 @@ def compare_professors(
         for label, ratings in pairs
     ]
 
-    # Sort best → worst on chosen field (descending)
+    # Sort best -> worst on chosen field (descending)
     ranking = sorted(
         scored, key=lambda t: getattr(t[1], sort_by), reverse=True
     )

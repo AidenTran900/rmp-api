@@ -260,7 +260,7 @@ class ProfessorComparison:
     Produced by :func:`~scoring.compare_professors`.
 
     Attributes:
-        ranking: List of ``(label, score)`` pairs sorted best → worst by ``sort_by``.
+        ranking: List of ``(label, score)`` pairs sorted best -> worst by ``sort_by``.
         scores: ``{label: ProfessorScore}`` mapping for direct lookup.
         sort_by: Name of the :class:`ProfessorScore` field used for ranking.
         best: Label of the top-ranked professor.

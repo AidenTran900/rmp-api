@@ -1,54 +1,73 @@
 # rmp-api
 
-Python wrapper for the RateMyProfessors GraphQL API. Fetch professor ratings, reviews, and computed quality signals.
+A Python library for querying the RateMyProfessors GraphQL API. Search for professors, fetch their ratings, and compute quality signals from the data.
 
-> Based on [snow4060/rmp-api](https://github.com/snow4060/rmp-api).
+No API key required. No scraping. Requires Python 3.10+.
 
 ---
 
 ## Installation
 
 ```bash
-pip install git+https://github.com/youruser/rate-my-prof-api.git
+pip install git+https://github.com/AidenTran900/rmp-api.git
 ```
 
 Or clone and install locally:
 
 ```bash
-git clone https://github.com/youruser/rate-my-prof-api.git
+git clone https://github.com/AidenTran900/rmp-api.git
 cd rate-my-prof-api
 pip install -e .
 ```
 
 ---
 
-## Quick Start
+## Quick start
 
 ```python
-from rmp_api import search_schools, search_professors, get_professor_summary, get_all_ratings, compute_score, WEIGHT_PRESETS
+from rmp_api import search_schools, search_professors, get_all_ratings, compute_score
 
-# Find a school
 schools = search_schools("UC Berkeley")
 school_id = schools[0].id
 
-# Get aggregate stats
-summary = get_professor_summary("John DeNero", school_id)
-print(summary.avg_rating, summary.link)
+professors = search_professors("John DeNero", school_id)
+professor_id = professors[0].id
 
-# Fetch all individual ratings
-professor_id = search_professors("John DeNero", school_id)[0].id
 ratings = get_all_ratings(professor_id)
+score = compute_score(ratings)
 
-# Compute quality signals
-score = compute_score(ratings, weights=WEIGHT_PRESETS["best_teacher"])
-print(score.composite_score, score.top_tags)
+print(score.composite_score)     # 0.82
+print(score.raw_avg_rating)      # 4.1
+print(score.top_tags[:3])        # [('Respected', 14), ('Clear grading', 11), ...]
 ```
+
+---
+
+## What it does
+
+- Search for schools and professors by name
+- Fetch individual student ratings with comments, grades, tags, and difficulty scores
+- Compute quality signals: recency-weighted rating, reliability score, easiness, would-take-again rate
+- Compare multiple professors side-by-side on any signal
+- Track how a professor's score has changed over time (by year, semester, or quarter)
+- Filter ratings by course code, keyword, or delivery format
+
+---
+
+## Documentation
+
+Full docs at **[AidenTran900.github.io/rmp-api](https://AidenTran900.github.io/rmp-api)** (Getting Started, API Reference, Examples, Troubleshooting).
 
 ---
 
 ## Notes
 
-- No auth required — uses the public GraphQL endpoint.
-- Ratings are returned **newest first**.
-- `search_schools` and `search_professors` return typed dataclasses. Use `.id` for API calls, `.legacy_id` only for building profile URLs.
-- RMP may rate-limit heavy pagination. Add `time.sleep(0.5)` between requests if needed.
+- Uses RateMyProfessors' public GraphQL endpoint. No auth required.
+- This wraps an **unofficial API**!!! It may break if RMP changes their internal schema.
+- Ratings are returned newest first.
+- Results are cached per process. Call `.cache_clear()` on `search_schools`, `search_professors`, or `get_courses` to invalidate.
+- RMP may rate-limit heavy requests. Add `time.sleep(0.5)` between calls when fetching many professors.
+
+---
+
+> Built off [snow4060/rmp-api](https://github.com/snow4060/rmp-api).
