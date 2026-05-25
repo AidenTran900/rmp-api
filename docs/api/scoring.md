@@ -17,9 +17,9 @@ score = compute_score(ratings, weights=WEIGHT_PRESETS["best_teacher"])
 | Key | What it emphasizes |
 |-----|---------------------|
 | `"overall"` | Balanced default |
-| `"best_teacher"` | Recency and would-take-again |
+| `"best_teacher"` | Teaching quality; ignores difficulty |
 | `"easiest"` | Easiness (low difficulty) |
-| `"most_reliable"` | Reliability (large sample size) |
+| `"rigorous"` | Harder courses score higher (negative easiness weight) |
 
 ## Custom weights
 
