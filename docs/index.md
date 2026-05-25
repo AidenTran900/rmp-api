@@ -18,19 +18,45 @@ Requires Python 3.10+.
 ## Example
 
 ```python
-from rmp_api import search_schools, search_professors, get_all_ratings, compute_score
+from rmp_api import (
+    search_schools,
+    search_professors,
+    get_professor_summary,
+    get_all_ratings,
+    get_courses,
+    filter_ratings_by_keywords,
+    compute_score,
+)
 
+# Find a school
 schools = search_schools("UC Berkeley")
 school_id = schools[0].id
 
+# Find a professor
 professors = search_professors("John DeNero", school_id)
 professor_id = professors[0].id
 
-ratings = get_all_ratings(professor_id)
-score = compute_score(ratings)
+# Quick aggregate summary (single request, no pagination)
+summary = get_professor_summary("John DeNero", school_id)
+print(summary.avg_rating)               # 4.2
+print(summary.avg_difficulty)           # 2.8
+print(summary.would_take_again_percent) # 92.0
+print(summary.link)                     # https://www.ratemyprofessors.com/professor/...
 
-print(score.composite_score)     # 0.82
-print(score.top_tags[:3])        # [('Respected', 14), ('Clear grading', 11), ...]
+# Courses taught
+courses = get_courses(professor_id)
+print(courses[:3])  # [{'courseName': 'CS61A', 'courseCount': 42}, ...]
+
+# All ratings (auto-paginated); optionally filter to a course
+ratings = get_all_ratings(professor_id, course_filter="CS61A")
+
+# Filter by keyword
+hard_ratings = filter_ratings_by_keywords(ratings, "hard")
+
+# Compute quality signals
+score = compute_score(ratings)
+print(score.composite_score)  # 0.82
+print(score.top_tags[:3])     # [('Respected', 14), ('Clear grading', 11), ...]
 ```
 
 ---
