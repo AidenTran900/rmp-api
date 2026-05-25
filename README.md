@@ -56,7 +56,7 @@ print(score.top_tags[:3])        # [('Respected', 14), ('Clear grading', 11), ..
 
 ## Documentation
 
-Full docs at **[docs.aidentran.dev/rmp-api](https://docs.aidentran.dev/rmp-api)** (Getting Started, API Reference, Examples, Troubleshooting).
+Full docs at **[docs.aidentran.dev/rmp-api/](https://docs.aidentran.dev/rmp-api/)** (Getting Started, API Reference, Examples, Troubleshooting).
 
 ---
 
